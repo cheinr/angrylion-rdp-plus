@@ -645,7 +645,7 @@ void n64video_update_screen(void)
 
     // cancel if the frame buffer contains no valid address
     if (!frame_buffer) {
-        vdac_sync(true);
+        vdac_sync(false);
         return;
     }
 
@@ -747,7 +747,7 @@ void n64video_update_screen(void)
     }
 
     // render frame to screen or blank screen if the frame is invalid
-    vdac_sync(!valid);
+    vdac_sync(valid);
 }
 
 static void vi_close(void)

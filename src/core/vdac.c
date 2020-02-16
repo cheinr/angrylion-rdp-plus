@@ -270,7 +270,7 @@ void vdac_write(struct frame_buffer* fb)
     tex_height_out = fb->height_out;
 }
 
-void vdac_sync(bool invalid)
+void vdac_sync(bool valid)
 {
     // clear old buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -289,7 +289,7 @@ void vdac_sync(bool invalid)
     }
 
     // skip rendering and leave buffer blank if there's no valid input
-    if (invalid) {
+    if (!valid) {
         screen_update();
         return;
     }
