@@ -81,7 +81,7 @@ static void fetch_qword_copy(struct rdp_state* wstate, uint32_t* hidword, uint32
         tformat = wstate->tile[tilenum].format;
     }
 
-    tc_pipeline_copy(wstate, &sss, &sss1, &sss2, &sss3, &sst, tilenum);
+    tc_pipeline_copy(&wstate->tile[tilenum], &sss, &sss1, &sss2, &sss3, &sst);
     read_tmem_copy(wstate, sss, sss1, sss2, sss3, sst, tilenum, sortshort, hibits, lowbits);
     largetex = (tformat == FORMAT_YUV || (tformat == FORMAT_RGBA && tsize == PIXEL_SIZE_32BIT));
 

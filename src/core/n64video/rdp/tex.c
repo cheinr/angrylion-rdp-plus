@@ -1,50 +1,50 @@
 #ifdef N64VIDEO_C
 
-static STRICTINLINE void tcmask(struct rdp_state* wstate, int32_t* S, int32_t* T, int32_t num)
+static STRICTINLINE void tcmask(struct tile* tile, int32_t* S, int32_t* T)
 {
     int32_t wrap;
 
 
 
-    if (wstate->tile[num].mask_s)
+    if (tile->mask_s)
     {
-        if (wstate->tile[num].ms)
+        if (tile->ms)
         {
-            wrap = *S >> wstate->tile[num].f.masksclamped;
+            wrap = *S >> tile->f.masksclamped;
             wrap &= 1;
             *S ^= (-wrap);
         }
-        *S &= maskbits_table[wstate->tile[num].mask_s];
+        *S &= maskbits_table[tile->mask_s];
     }
 
-    if (wstate->tile[num].mask_t)
+    if (tile->mask_t)
     {
-        if (wstate->tile[num].mt)
+        if (tile->mt)
         {
-            wrap = *T >> wstate->tile[num].f.masktclamped;
+            wrap = *T >> tile->f.masktclamped;
             wrap &= 1;
             *T ^= (-wrap);
         }
 
-        *T &= maskbits_table[wstate->tile[num].mask_t];
+        *T &= maskbits_table[tile->mask_t];
     }
 }
 
 
-static STRICTINLINE void tcmask_coupled(struct rdp_state* wstate, int32_t* S, int32_t* sdiff, int32_t* T, int32_t* tdiff, int32_t num)
+static STRICTINLINE void tcmask_coupled(struct tile* tile, int32_t* S, int32_t* sdiff, int32_t* T, int32_t* tdiff)
 {
     int32_t wrap;
     int32_t maskbits;
     int32_t wrapthreshold;
 
 
-    if (wstate->tile[num].mask_s)
+    if (tile->mask_s)
     {
-        maskbits = maskbits_table[wstate->tile[num].mask_s];
+        maskbits = maskbits_table[tile->mask_s];
 
-        if (wstate->tile[num].ms)
+        if (tile->ms)
         {
-            wrapthreshold = wstate->tile[num].f.masksclamped;
+            wrapthreshold = tile->f.masksclamped;
 
             wrap = (*S >> wrapthreshold) & 1;
             *S ^= (-wrap);
@@ -68,13 +68,13 @@ static STRICTINLINE void tcmask_coupled(struct rdp_state* wstate, int32_t* S, in
     else
         *sdiff = 1;
 
-    if (wstate->tile[num].mask_t)
+    if (tile->mask_t)
     {
-        maskbits = maskbits_table[wstate->tile[num].mask_t];
+        maskbits = maskbits_table[tile->mask_t];
 
-        if (wstate->tile[num].mt)
+        if (tile->mt)
         {
-            wrapthreshold = wstate->tile[num].f.masktclamped;
+            wrapthreshold = tile->f.masktclamped;
 
             wrap = (*T >> wrapthreshold) & 1;
             *T ^= (-wrap);
@@ -172,7 +172,7 @@ static STRICTINLINE void texture_pipeline_cycle(struct rdp_state* wstate, struct
     sss1 = SSS;
     sst1 = SST;
 
-    tcshift_cycle(wstate, &sss1, &sst1, &maxs, &maxt, tilenum);
+    tcshift_cycle(&wstate->tile[tilenum], &sss1, &sst1, &maxs, &maxt);
 
     sss1 = TRELATIVE(sss1, wstate->tile[tilenum].sl);
     sst1 = TRELATIVE(sst1, wstate->tile[tilenum].tl);
@@ -185,14 +185,14 @@ static STRICTINLINE void texture_pipeline_cycle(struct rdp_state* wstate, struct
 
 
 
-        tcclamp_cycle(wstate, &sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum);
+        tcclamp_cycle(&wstate->tile[tilenum], &sss1, &sst1, &sfrac, &tfrac, maxs, maxt);
 
 
 
 
 
 
-        tcmask_coupled(wstate, &sss1, &sdiff, &sst1, &tdiff, tilenum);
+        tcmask_coupled(&wstate->tile[tilenum], &sss1, &sdiff, &sst1, &tdiff);
 
 
 
@@ -438,9 +438,9 @@ static STRICTINLINE void texture_pipeline_cycle(struct rdp_state* wstate, struct
 
 
 
-        tcclamp_cycle_light(wstate, &sss1, &sst1, maxs, maxt, tilenum);
+        tcclamp_cycle_light(&wstate->tile[tilenum], &sss1, &sst1, maxs, maxt);
 
-        tcmask(wstate, &sss1, &sst1, tilenum);
+        tcmask(&wstate->tile[tilenum], &sss1, &sst1);
 
 
 
@@ -580,7 +580,7 @@ static void loading_pipeline(struct rdp_state* wstate, int start, int end, int t
             sss = ss & 0xffff;
             sst = st & 0xffff;
 
-            tc_pipeline_load(wstate, &sss, &sst, tilenum, coord_quad);
+            tc_pipeline_load(&wstate->tile[tilenum], &sss, &sst, coord_quad);
 
             dswap = sst & 1;
 

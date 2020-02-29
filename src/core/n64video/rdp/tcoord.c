@@ -34,17 +34,17 @@ static int32_t maskbits_table[16];
 static int32_t log2table[256];
 static int32_t tcdiv_table[0x8000];
 
-static STRICTINLINE void tcmask_copy(struct rdp_state* wstate, int32_t* S, int32_t* S1, int32_t* S2, int32_t* S3, int32_t* T, int32_t num)
+static STRICTINLINE void tcmask_copy(struct tile* tile, int32_t* S, int32_t* S1, int32_t* S2, int32_t* S3, int32_t* T)
 {
     int32_t wrap;
     int32_t maskbits_s;
     int32_t swrapthreshold;
 
-    if (wstate->tile[num].mask_s)
+    if (tile->mask_s)
     {
-        if (wstate->tile[num].ms)
+        if (tile->ms)
         {
-            swrapthreshold = wstate->tile[num].f.masksclamped;
+            swrapthreshold = tile->f.masksclamped;
 
             wrap = (*S >> swrapthreshold) & 1;
             *S ^= (-wrap);
@@ -59,34 +59,34 @@ static STRICTINLINE void tcmask_copy(struct rdp_state* wstate, int32_t* S, int32
             *S3 ^= (-wrap);
         }
 
-        maskbits_s = maskbits_table[wstate->tile[num].mask_s];
+        maskbits_s = maskbits_table[tile->mask_s];
         *S &= maskbits_s;
         *S1 &= maskbits_s;
         *S2 &= maskbits_s;
         *S3 &= maskbits_s;
     }
 
-    if (wstate->tile[num].mask_t)
+    if (tile->mask_t)
     {
-        if (wstate->tile[num].mt)
+        if (tile->mt)
         {
-            wrap = *T >> wstate->tile[num].f.masktclamped;
+            wrap = *T >> tile->f.masktclamped;
             wrap &= 1;
             *T ^= (-wrap);
         }
 
-        *T &= maskbits_table[wstate->tile[num].mask_t];
+        *T &= maskbits_table[tile->mask_t];
     }
 }
 
 
-static STRICTINLINE void tcshift_cycle(struct rdp_state* wstate, int32_t* S, int32_t* T, int32_t* maxs, int32_t* maxt, uint32_t num)
+static STRICTINLINE void tcshift_cycle(struct tile* tile, int32_t* S, int32_t* T, int32_t* maxs, int32_t* maxt)
 {
 
 
 
     int32_t coord = *S;
-    int32_t shifter = wstate->tile[num].shift_s;
+    int32_t shifter = tile->shift_s;
 
 
     if (shifter < 11)
@@ -104,12 +104,12 @@ static STRICTINLINE void tcshift_cycle(struct rdp_state* wstate, int32_t* S, int
 
 
 
-    *maxs = ((coord >> 3) >= wstate->tile[num].sh);
+    *maxs = ((coord >> 3) >= tile->sh);
 
 
 
     coord = *T;
-    shifter = wstate->tile[num].shift_t;
+    shifter = tile->shift_t;
 
     if (shifter < 11)
     {
@@ -122,21 +122,21 @@ static STRICTINLINE void tcshift_cycle(struct rdp_state* wstate, int32_t* S, int
         coord = SIGN16(coord);
     }
     *T = coord;
-    *maxt = ((coord >> 3) >= wstate->tile[num].th);
+    *maxt = ((coord >> 3) >= tile->th);
 }
 
-static STRICTINLINE void tcclamp_cycle(struct rdp_state* wstate, int32_t* S, int32_t* T, int32_t* SFRAC, int32_t* TFRAC, int32_t maxs, int32_t maxt, int32_t num)
+static STRICTINLINE void tcclamp_cycle(struct tile* tile, int32_t* S, int32_t* T, int32_t* SFRAC, int32_t* TFRAC, int32_t maxs, int32_t maxt)
 {
 
 
 
     int32_t locs = *S, loct = *T;
-    if (wstate->tile[num].f.clampens)
+    if (tile->f.clampens)
     {
 
         if (maxs)
         {
-            *S = wstate->tile[num].f.clampdiffs;
+            *S = tile->f.clampdiffs;
             *SFRAC = 0;
         }
         else if (!(locs & 0x10000))
@@ -150,11 +150,11 @@ static STRICTINLINE void tcclamp_cycle(struct rdp_state* wstate, int32_t* S, int
     else
         *S = (locs >> 5);
 
-    if (wstate->tile[num].f.clampent)
+    if (tile->f.clampent)
     {
         if (maxt)
         {
-            *T = wstate->tile[num].f.clampdifft;
+            *T = tile->f.clampdifft;
             *TFRAC = 0;
         }
         else if (!(loct & 0x10000))
@@ -170,13 +170,13 @@ static STRICTINLINE void tcclamp_cycle(struct rdp_state* wstate, int32_t* S, int
 }
 
 
-static STRICTINLINE void tcclamp_cycle_light(struct rdp_state* wstate, int32_t* S, int32_t* T, int32_t maxs, int32_t maxt, int32_t num)
+static STRICTINLINE void tcclamp_cycle_light(struct tile* tile, int32_t* S, int32_t* T, int32_t maxs, int32_t maxt)
 {
     int32_t locs = *S, loct = *T;
-    if (wstate->tile[num].f.clampens)
+    if (tile->f.clampens)
     {
         if (maxs)
-            *S = wstate->tile[num].f.clampdiffs;
+            *S = tile->f.clampdiffs;
         else if (!(locs & 0x10000))
             *S = locs >> 5;
         else
@@ -185,10 +185,10 @@ static STRICTINLINE void tcclamp_cycle_light(struct rdp_state* wstate, int32_t* 
     else
         *S = (locs >> 5);
 
-    if (wstate->tile[num].f.clampent)
+    if (tile->f.clampent)
     {
         if (maxt)
-            *T = wstate->tile[num].f.clampdifft;
+            *T = tile->f.clampdifft;
         else if (!(loct & 0x10000))
             *T = loct >> 5;
         else
@@ -198,10 +198,10 @@ static STRICTINLINE void tcclamp_cycle_light(struct rdp_state* wstate, int32_t* 
         *T = (loct >> 5);
 }
 
-static STRICTINLINE void tcshift_copy(struct rdp_state* wstate, int32_t* S, int32_t* T, uint32_t num)
+static STRICTINLINE void tcshift_copy(struct tile* tile, int32_t* S, int32_t* T)
 {
     int32_t coord = *S;
-    int32_t shifter = wstate->tile[num].shift_s;
+    int32_t shifter = tile->shift_s;
 
     if (shifter < 11)
     {
@@ -216,7 +216,7 @@ static STRICTINLINE void tcshift_copy(struct rdp_state* wstate, int32_t* S, int3
     *S = coord;
 
     coord = *T;
-    shifter = wstate->tile[num].shift_t;
+    shifter = tile->shift_t;
 
     if (shifter < 11)
     {
@@ -958,16 +958,16 @@ static STRICTINLINE void tclod_copy(struct rdp_state* wstate, int32_t* sss, int3
 
 }
 
-static STRICTINLINE void tc_pipeline_copy(struct rdp_state* wstate, int32_t* sss0, int32_t* sss1, int32_t* sss2, int32_t* sss3, int32_t* sst, int tilenum)
+static STRICTINLINE void tc_pipeline_copy(struct tile* tile, int32_t* sss0, int32_t* sss1, int32_t* sss2, int32_t* sss3, int32_t* sst)
 {
     int ss0 = *sss0, ss1 = 0, ss2 = 0, ss3 = 0, st = *sst;
 
-    tcshift_copy(wstate, &ss0, &st, tilenum);
+    tcshift_copy(tile, &ss0, &st);
 
 
 
-    ss0 = TRELATIVE(ss0, wstate->tile[tilenum].sl);
-    st = TRELATIVE(st, wstate->tile[tilenum].tl);
+    ss0 = TRELATIVE(ss0, tile->sl);
+    st = TRELATIVE(st, tile->tl);
     ss0 = (ss0 >> 5);
     st = (st >> 5);
 
@@ -975,7 +975,7 @@ static STRICTINLINE void tc_pipeline_copy(struct rdp_state* wstate, int32_t* sss
     ss2 = ss0 + 2;
     ss3 = ss0 + 3;
 
-    tcmask_copy(wstate, &ss0, &ss1, &ss2, &ss3, &st, tilenum);
+    tcmask_copy(tile, &ss0, &ss1, &ss2, &ss3, &st);
 
     *sss0 = ss0;
     *sss1 = ss1;
@@ -984,15 +984,15 @@ static STRICTINLINE void tc_pipeline_copy(struct rdp_state* wstate, int32_t* sss
     *sst = st;
 }
 
-static STRICTINLINE void tc_pipeline_load(struct rdp_state* wstate, int32_t* sss, int32_t* sst, int tilenum, int coord_quad)
+static STRICTINLINE void tc_pipeline_load(struct tile* tile, int32_t* sss, int32_t* sst, int coord_quad)
 {
     int sss1 = *sss, sst1 = *sst;
     sss1 = SIGN16(sss1);
     sst1 = SIGN16(sst1);
 
 
-    sss1 = TRELATIVE(sss1, wstate->tile[tilenum].sl);
-    sst1 = TRELATIVE(sst1, wstate->tile[tilenum].tl);
+    sss1 = TRELATIVE(sss1, tile->sl);
+    sst1 = TRELATIVE(sst1, tile->tl);
 
 
 
