@@ -131,7 +131,7 @@ static void cmd_run_buffered(uint32_t worker_id)
 {
     uint32_t pos;
     for (pos = 0; pos < rdp_cmd_buf_pos; pos++) {
-        rdp_cmd(worker_id, rdp_cmd_buf[pos]);
+        rdp_cmd(&state[worker_id], rdp_cmd_buf[pos]);
     }
 }
 
@@ -163,9 +163,15 @@ void n64video_config_init(struct n64video_config* config)
     config->dp.compat = DP_COMPAT_MEDIUM;
 }
 
-void rdp_init_worker(uint32_t worker_id)
+static void n64video_init_parallel(uint32_t worker_id)
 {
-    rdp_init(worker_id, parallel_num_workers());
+    struct rdp_state* wstate = &state[worker_id];
+
+    wstate->stride = parallel_num_workers();
+    wstate->offset = worker_id;
+    wstate->rseed = 3 + worker_id * 13;
+
+    rdp_init(wstate);
 }
 
 void n64video_init(struct n64video_config* _config)
@@ -182,11 +188,6 @@ void n64video_init(struct n64video_config* _config)
         combiner_init_lut();
         tex_init_lut();
         z_init_lut();
-
-        fb_init(0);
-        combiner_init(0);
-        tex_init(0);
-        rasterizer_init(0);
 
         static_init = true;
     }
@@ -221,9 +222,13 @@ void n64video_init(struct n64video_config* _config)
         }
 
         // init workers
-        parallel_run(rdp_init_worker);
+        parallel_run(n64video_init_parallel);
     } else {
-        rdp_init(0, 1);
+        struct rdp_state* wstate = &state[0];
+        wstate->stride = 1;
+        wstate->offset = 0;
+        wstate->rseed = 3;
+        rdp_init(wstate);
     }
 }
 
@@ -280,7 +285,7 @@ void n64video_process_list(void)
                     cmd_flush();
 
                     // parameters are unused, so NULL is fine
-                    rdp_sync_full(0, NULL);
+                    rdp_sync_full(NULL, NULL);
                 } else {
                     // increment buffer position
                     rdp_cmd_buf_pos++;
@@ -292,7 +297,7 @@ void n64video_process_list(void)
                 }
             } else {
                 // run command directly
-                rdp_cmd(0, cmd_buf);
+                rdp_cmd(&state[0], cmd_buf);
             }
 
             // send Z-buffer address to VI for "depth" output mode
