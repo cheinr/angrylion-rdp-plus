@@ -22,8 +22,14 @@ public:
         }
 
         // mask for m_tasks_done when all workers have finished their task
-        // except for worker 0, which runs in the main thread
-        m_all_tasks_done = (1LL << m_num_workers) - 2;
+        if (m_num_workers == PARALLEL_MAX_WORKERS) {
+            m_all_tasks_done = ~0ULL;
+        } else {
+            m_all_tasks_done = (1ULL << m_num_workers) - 1;
+        }
+
+        // except worker 0, which runs in the main thread
+        m_all_tasks_done--;
 
         // give workers an empty task
         m_task = [](std::uint32_t) {};
