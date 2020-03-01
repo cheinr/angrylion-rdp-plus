@@ -494,7 +494,7 @@ static void deduce_derivatives(struct rdp_state* wstate)
 
 
     int texel1_used_in_cc1 = 0, texel0_used_in_cc1 = 0, texel0_used_in_cc0 = 0, texel1_used_in_cc0 = 0;
-    int texels_in_cc0 = 0, texels_in_cc1 = 0;
+    //int texels_in_cc0 = 0, texels_in_cc1 = 0;
     int lod_frac_used_in_cc1 = 0, lod_frac_used_in_cc0 = 0;
     int texels_or_lf_used_in_ac0 = 0, texel0_used_in_ac0 = 0, texel1_used_in_ac0 = 0;
 
@@ -522,8 +522,8 @@ static void deduce_derivatives(struct rdp_state* wstate)
         texel0_used_in_ac0 || wstate->combiner_rgbmul_r[0] == &wstate->texel0_color.a)
         texel0_used_in_cc0 = 1;
     texels_or_lf_used_in_ac0 = texel0_used_in_ac0 || texel1_used_in_ac0 || (wstate->combiner_alphamul[0] == &wstate->lod_frac);
-    texels_in_cc0 = texel0_used_in_cc0 || texel1_used_in_cc0;
-    texels_in_cc1 = texel0_used_in_cc1 || texel1_used_in_cc1;
+    //texels_in_cc0 = texel0_used_in_cc0 || texel1_used_in_cc0;
+    //texels_in_cc1 = texel0_used_in_cc1 || texel1_used_in_cc1;
 
 
     if (texel1_used_in_cc1)
