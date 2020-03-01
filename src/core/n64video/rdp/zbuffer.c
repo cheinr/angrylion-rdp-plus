@@ -10,14 +10,14 @@ static uint32_t z_complete_dec_table[0x4000];
 static uint16_t deltaz_comparator_lut[0x10000];
 
 static struct {uint32_t shift; uint32_t add;} z_dec_table[8] = {
-     6, 0x00000,
-     5, 0x20000,
-     4, 0x30000,
-     3, 0x38000,
-     2, 0x3c000,
-     1, 0x3e000,
-     0, 0x3f000,
-     0, 0x3f800,
+     { 6, 0x00000 },
+     { 5, 0x20000 },
+     { 4, 0x30000 },
+     { 3, 0x38000 },
+     { 2, 0x3c000 },
+     { 1, 0x3e000 },
+     { 0, 0x3f000 },
+     { 0, 0x3f800 },
 };
 
 static STRICTINLINE uint32_t z_decompress(uint32_t zb)
