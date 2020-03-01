@@ -806,16 +806,16 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
 
 
 
-#define ADJUST_ATTR_LOAD()                                      \
-{                                                               \
-    wstate->span[j].s = s & ~0x3ff;                                     \
-    wstate->span[j].t = t & ~0x3ff;                                     \
-}
 
 
-#define ADDVALUES_LOAD() {  \
-            t += dtde;      \
-}
+
+
+
+
+
+
+
+
 
     int32_t maxxmx, minxhx;
 
@@ -866,7 +866,8 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
             if (spix == 0)
             {
                 wstate->span[j].unscrx = xend;
-                ADJUST_ATTR_LOAD();
+                wstate->span[j].s = s & ~0x3ff;
+                wstate->span[j].t = t & ~0x3ff;
             }
 
             if (spix == 3)
@@ -882,7 +883,7 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
 
         if (spix == 3)
         {
-            ADDVALUES_LOAD();
+            t += dtde;
         }
 
 
