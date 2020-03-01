@@ -58,7 +58,7 @@ typedef void(*vi_fetch_filter_func)(struct rgba*, uint32_t, uint32_t, struct vi_
 #include "vi/fetch.c"
 
 // states
-static uint32_t prevvicurrent;
+static int32_t prevvicurrent;
 static int32_t emucontrolsvicurrent;
 static bool prevserrate;
 static bool lowerfield;
