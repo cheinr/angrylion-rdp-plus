@@ -50,6 +50,15 @@ if (NOT ANDROID)
     find_package(OpenGL REQUIRED)
 endif()
 
+# use warning levels as recommended by
+# https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
+if ( CMAKE_COMPILER_IS_GNUCC )
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic")
+endif()
+if ( MSVC )
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /w14640 /permissive-")
+endif()
+
 set(PATH_SRC "src")
 
 # RDP core library
