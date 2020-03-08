@@ -268,7 +268,7 @@ static INLINE void fetch_texel(struct rdp_state* wstate, struct color *color, in
 
             p = wstate->tmem[taddr & 0xfff];
             p = (s & 1) ? (p & 0xf) : (p >> 4);
-            p = (tpal << 4) | p;
+            p = (uint8_t)(tpal << 4) | p;
             color->r = color->g = color->b = color->a = p;
         }
         break;
@@ -2060,7 +2060,7 @@ static void tmem_init_lut(void)
 {
     int i;
     for (i = 0; i < 32; i++)
-        replicated_rgba[i] = (i << 3) | ((i >> 2) & 7);
+        replicated_rgba[i] = (uint8_t)((i << 3) | ((i >> 2) & 7));
 }
 
 #endif // N64VIDEO_C

@@ -507,17 +507,17 @@ static void vi_process_fast_parallel(uint32_t worker_id)
                     switch (ctrl.type) {
                         case VI_TYPE_RGBA5551: {
                             uint16_t pix = rdram_read_idx16((frame_buffer >> 1) + line + x);
-                            pixel->r = RGBA16_R(pix);
-                            pixel->g = RGBA16_G(pix);
-                            pixel->b = RGBA16_B(pix);
+                            pixel->r = (uint8_t)RGBA16_R(pix);
+                            pixel->g = (uint8_t)RGBA16_G(pix);
+                            pixel->b = (uint8_t)RGBA16_B(pix);
                             break;
                         }
 
                         case VI_TYPE_RGBA8888: {
                             uint32_t pix = rdram_read_idx32((frame_buffer >> 2) + line + x);
-                            pixel->r = RGBA32_R(pix);
-                            pixel->g = RGBA32_G(pix);
-                            pixel->b = RGBA32_B(pix);
+                            pixel->r = (uint8_t)RGBA32_R(pix);
+                            pixel->g = (uint8_t)RGBA32_G(pix);
+                            pixel->b = (uint8_t)RGBA32_B(pix);
                             break;
                         }
 

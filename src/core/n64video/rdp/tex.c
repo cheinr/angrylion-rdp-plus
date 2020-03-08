@@ -488,7 +488,7 @@ static void loading_pipeline(struct rdp_state* wstate, int start, int end, int t
 {
 
 
-    int localdebugmode = 0, cnt = 0;
+    //int localdebugmode = 0, cnt = 0;
     int i, j;
 
     int dsinc, dtinc;
@@ -505,8 +505,8 @@ static void loading_pipeline(struct rdp_state* wstate, int start, int end, int t
     int dswap = 0;
     uint32_t readval0, readval1, readval2, readval3;
     uint32_t readidx32;
-    uint64_t loadqword;
-    uint16_t tempshort;
+    uint64_t loadqword = 0;
+    uint16_t tempshort = 0;
     int tmem_formatting = 0;
     uint32_t bit3fl = 0, hibit = 0;
 
@@ -739,7 +739,7 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
 {
     int j = 0;
     int xleft = 0, xright = 0;
-    int xstart = 0, xend = 0;
+    int /*xstart = 0,*/ xend = 0;
     int s = 0, t = 0, w = 0;
     int dsdx = 0, dtdx = 0;
     int dsdy = 0, dtdy = 0;
@@ -795,9 +795,9 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
 
     int k = 0;
 
-    int sign_dxhdy = 0;
+    //int sign_dxhdy = 0;
 
-    int do_offset = 0;
+    //int do_offset = 0;
 
     int xfrac = 0;
 
@@ -817,15 +817,15 @@ static void edgewalker_for_loads(struct rdp_state* wstate, int32_t* lewdata)
 
 
 
-    int32_t maxxmx, minxhx;
+    int32_t maxxmx = 0, minxhx = 0;
 
     int spix = 0;
     int ycur =  yh & ~3;
     int ylfar = yl | 3;
 
     int valid_y = 1;
-    int length = 0;
-    int32_t xrsc = 0, xlsc = 0, stickybit = 0;
+    //int length = 0;
+    int32_t xrsc = 0, xlsc = 0/*, stickybit = 0*/;
     int32_t yllimit = yl;
     int32_t yhlimit = yh;
 
@@ -907,7 +907,7 @@ void rdp_set_tile_size(struct rdp_state* wstate, const uint32_t* args)
 void rdp_load_block(struct rdp_state* wstate, const uint32_t* args)
 {
     int tilenum = (args[1] >> 24) & 0x7;
-    int sl, sh, tl, dxt;
+    uint16_t sl, sh, tl, dxt;
 
 
     wstate->tile[tilenum].sl = sl = ((args[0] >> 12) & 0xfff);
@@ -939,7 +939,7 @@ void rdp_load_block(struct rdp_state* wstate, const uint32_t* args)
 static void tile_tlut_common_cs_decoder(struct rdp_state* wstate, const uint32_t* args)
 {
     int tilenum = (args[1] >> 24) & 0x7;
-    int sl, tl, sh, th;
+    uint16_t sl, tl, sh, th;
 
 
     wstate->tile[tilenum].sl = sl = ((args[0] >> 12) & 0xfff);

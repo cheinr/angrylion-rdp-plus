@@ -160,7 +160,7 @@ static STRICTINLINE void compute_cvg_noflip(struct rdp_state* wstate, int32_t sc
 
 static STRICTINLINE int finalize_spanalpha(int cvg_dest, uint32_t blend_en, uint32_t curpixel_cvg, uint32_t curpixel_memcvg)
 {
-    int finalcvg;
+    int finalcvg = 0;
 
 
 
@@ -216,14 +216,13 @@ static STRICTINLINE void lookup_cvmask_derivatives(uint8_t mask, uint8_t* offx, 
 
 static void coverage_init_lut(void)
 {
-    int i = 0, k = 0;
+    uint8_t i = 0, k = 0;
     uint16_t mask = 0, maskx = 0, masky = 0;
     uint8_t offx = 0, offy = 0;
     const uint8_t yarray[16] = {0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
     const uint8_t xarray[16] = {0, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    for (; i < 0x100; i++)
-    {
+    do {
         mask = decompress_cvmask_frombyte(i);
         cvarray[i].cvg = cvarray[i].cvbit = 0;
         cvarray[i].cvbit = (i >> 7) & 1;
@@ -244,7 +243,7 @@ static void coverage_init_lut(void)
 
         cvarray[i].xoff = offx;
         cvarray[i].yoff = offy;
-    }
+    } while (i++ != 0xff);
 }
 
 #endif // N64VIDEO_C

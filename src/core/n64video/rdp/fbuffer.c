@@ -75,12 +75,12 @@ static void fbwrite_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, 
     }
     else
     {
-        finalcolor = (r << 8) | (finalcvg << 5);
+        finalcolor = (int16_t)((r << 8) | (finalcvg << 5));
         finalcvg = 0;
     }
 
 
-    rval = finalcolor|(finalcvg >> 2);
+    rval = finalcolor|(uint16_t)(finalcvg >> 2);
     hval = finalcvg & 3;
     PAIRWRITE16(fb, rval, hval);
 }
@@ -109,7 +109,7 @@ static void fbfill_4(struct rdp_state* wstate, uint32_t curpixel)
 static void fbfill_8(struct rdp_state* wstate, uint32_t curpixel)
 {
     uint32_t fb = wstate->fb_address + curpixel;
-    uint32_t val = (wstate->fill_color >> (((fb & 3) ^ 3) << 3)) & 0xff;
+    uint8_t val = (wstate->fill_color >> ((fb & 3) ^ 3) << 3) & 0xff;
     uint8_t hval = ((val & 1) << 1) | (val & 1);
     PAIRWRITE8(fb, val, hval);
 }

@@ -16,7 +16,7 @@ static STRICTINLINE int32_t normalize_dzpix(int32_t sum)
         if (sum & count)
             return (count << 1);
     }
-    msg_error("normalize_dzpix: invalid codepath taken");
+
     return 0;
 }
 
@@ -190,7 +190,8 @@ static void render_spans_1cycle_complete(struct rdp_state* wstate, int start, in
 {
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     struct spansigs sigs;
     uint32_t blend_en;
     uint32_t prewrap;
@@ -231,12 +232,12 @@ static void render_spans_1cycle_complete(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -246,7 +247,7 @@ static void render_spans_1cycle_complete(struct rdp_state* wstate, int start, in
     int sr, sg, sb, sa, sz, ss, st, sw;
     int xstart, xend, xendsc;
     int sss = 0, sst = 0;
-    int32_t prelodfrac;
+    int32_t prelodfrac = 0;
     int curpixel = 0;
     int x, length, scdiff, lodlength;
     uint32_t fir, fig, fib;
@@ -401,7 +402,8 @@ static void render_spans_1cycle_notexel1(struct rdp_state* wstate, int start, in
 {
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     struct spansigs sigs;
     uint32_t blend_en;
     uint32_t prewrap;
@@ -439,12 +441,12 @@ static void render_spans_1cycle_notexel1(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -573,9 +575,12 @@ static void render_spans_1cycle_notexel1(struct rdp_state* wstate, int start, in
 
 static void render_spans_1cycle_notex(struct rdp_state* wstate, int start, int end, int tilenum, int flip)
 {
+    UNUSED(tilenum);
+
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     uint32_t blend_en;
     uint32_t prewrap;
     uint32_t curpixel_cvg, curpixel_cvbit, curpixel_memcvg;
@@ -604,12 +609,12 @@ static void render_spans_1cycle_notex(struct rdp_state* wstate, int start, int e
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -709,12 +714,13 @@ static void render_spans_2cycle_complete(struct rdp_state* wstate, int start, in
 {
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     int32_t prelodfrac;
     struct color nexttexel1_color;
     uint32_t blend_en;
     uint32_t prewrap;
-    uint32_t curpixel_cvg, curpixel_cvbit, curpixel_memcvg;
+    uint32_t curpixel_cvg = 0, curpixel_cvbit = 0, curpixel_memcvg = 0;
     uint32_t nextpixel_cvg;
     uint32_t acalpha;
 
@@ -754,12 +760,12 @@ static void render_spans_2cycle_complete(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -983,10 +989,11 @@ static void render_spans_2cycle_notexelnext(struct rdp_state* wstate, int start,
 {
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     uint32_t blend_en;
     uint32_t prewrap;
-    uint32_t curpixel_cvg, curpixel_cvbit, curpixel_memcvg;
+    uint32_t curpixel_cvg = 0, curpixel_cvbit = 0, curpixel_memcvg = 0;
     uint32_t nextpixel_cvg;
     uint32_t acalpha;
 
@@ -1023,12 +1030,12 @@ static void render_spans_2cycle_notexelnext(struct rdp_state* wstate, int start,
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1199,10 +1206,11 @@ static void render_spans_2cycle_notexel1(struct rdp_state* wstate, int start, in
 {
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     uint32_t blend_en;
     uint32_t prewrap;
-    uint32_t curpixel_cvg, curpixel_cvbit, curpixel_memcvg;
+    uint32_t curpixel_cvg = 0, curpixel_cvbit = 0, curpixel_memcvg = 0;
     uint32_t nextpixel_cvg;
     uint32_t acalpha;
 
@@ -1238,12 +1246,12 @@ static void render_spans_2cycle_notexel1(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1410,12 +1418,15 @@ static void render_spans_2cycle_notexel1(struct rdp_state* wstate, int start, in
 
 static void render_spans_2cycle_notex(struct rdp_state* wstate, int start, int end, int tilenum, int flip)
 {
+    UNUSED(tilenum);
+
     int zb = wstate->zb_address >> 1;
     int zbcur;
-    uint8_t offx, offy;
+    uint8_t offx = 0;
+    uint8_t offy = 0;
     uint32_t blend_en;
     uint32_t prewrap;
-    uint32_t curpixel_cvg, curpixel_cvbit, curpixel_memcvg;
+    uint32_t curpixel_cvg = 0, curpixel_cvbit = 0, curpixel_memcvg = 0;
     uint32_t nextpixel_cvg;
     uint32_t acalpha;
 
@@ -1442,12 +1453,12 @@ static void render_spans_2cycle_notex(struct rdp_state* wstate, int start, int e
         xinc = -1;
     }
 
-    int dzpix;
+    uint16_t dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = wstate->spans_dzpix;
+        dzpix = (uint16_t)wstate->spans_dzpix;
     else
     {
-        dzpix = wstate->primitive_delta_z;
+        dzpix = (uint16_t)wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1700,17 +1711,18 @@ static void render_spans_copy(struct rdp_state* wstate, int start, int end, int 
     }
 
     int xstart = 0, xendsc;
-    int s = 0, t = 0, w = 0, ss = 0, st = 0, sw = 0, sss = 0, sst = 0, ssw = 0;
+    int s = 0, t = 0, w = 0, ss = 0, st = 0, sw = 0, sss = 0, sst = 0/*, ssw = 0*/;
     int fb_index, length;
-    int diff = 0;
+    //int diff = 0;
 
     uint32_t hidword = 0, lowdword = 0;
-    uint32_t hidword1 = 0, lowdword1 = 0;
+    //uint32_t hidword1 = 0, lowdword1 = 0;
     int fbadvance = (wstate->fb_size == PIXEL_SIZE_4BIT) ? 8 : 16 >> wstate->fb_size;
     uint32_t fbptr = 0;
     int fbptr_advance = flip ? 8 : -8;
     uint64_t copyqword = 0;
-    uint32_t tempdword = 0, tempbyte = 0;
+    uint32_t tempdword = 0;
+    uint8_t tempbyte = 0;
     int copywmask = 0, alphamask = 0;
     int bytesperpixel = (wstate->fb_size == PIXEL_SIZE_4BIT) ? 1 : (1 << (wstate->fb_size - 1));
     uint32_t fbendptr = 0;
@@ -1804,7 +1816,7 @@ static void render_spans_copy(struct rdp_state* wstate, int start, int end, int 
             k = 7;
             while(copywmask > 0)
             {
-                tempbyte = (uint32_t)((copyqword >> (k << 3)) & 0xff);
+                tempbyte = (uint8_t)((copyqword >> (k << 3)) & 0xff);
                 if (alphamask & (1 << k))
                 {
                     PAIRWRITE8(tempdword, tempbyte, (tempbyte & 1) ? 3 : 0);
@@ -1828,7 +1840,7 @@ static void edgewalker_for_prims(struct rdp_state* wstate, int32_t* ewdata)
     int j = 0;
     int xleft = 0, xright = 0, xleft_inc = 0, xright_inc = 0;
     int r = 0, g = 0, b = 0, a = 0, z = 0, s = 0, t = 0, w = 0;
-    int dr = 0, dg = 0, db = 0, da = 0;
+    //int dr = 0, dg = 0, db = 0, da = 0;
     int drdx = 0, dgdx = 0, dbdx = 0, dadx = 0, dzdx = 0, dsdx = 0, dtdx = 0, dwdx = 0;
     int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
     int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
@@ -2053,13 +2065,13 @@ static void edgewalker_for_prims(struct rdp_state* wstate, int32_t* ewdata)
             z += dzde; \
 }
 
-    int32_t maxxmx, minxmx, maxxhx, minxhx;
+    int32_t maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
     int spix = 0;
     int ycur =  yh & ~3;
     int ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
     int invaly = 1;
-    int length = 0;
+    //int length = 0;
     int32_t xrsc = 0, xlsc = 0, stickybit = 0;
     int32_t yllimit = 0, yhlimit = 0;
     if (yl & 0x2000)

@@ -327,7 +327,7 @@ static void blender_init_lut(void)
             if (temp & 0x10)
                 res |= (1 << (7 - k));
         }
-        bldiv_hwaccurate_table[i] = res;
+        bldiv_hwaccurate_table[i] = (uint8_t)res;
     }
 }
 

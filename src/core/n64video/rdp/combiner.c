@@ -173,8 +173,8 @@ static STRICTINLINE int32_t chroma_key_min(struct rdp_state* wstate, struct colo
 static STRICTINLINE void combiner_1cycle(struct rdp_state* wstate, int adseed, uint32_t* curpixel_cvg)
 {
 
-    int32_t keyalpha, temp;
-    struct color chromabypass;
+    int32_t keyalpha = 0, temp = 0;
+    struct color chromabypass = { 0 };
 
     if (wstate->other_modes.key_en)
     {
@@ -348,8 +348,8 @@ static STRICTINLINE void combiner_2cycle_cycle0(struct rdp_state* wstate, int ad
 
 static STRICTINLINE void combiner_2cycle_cycle1(struct rdp_state* wstate, int adseed, uint32_t* curpixel_cvg)
 {
-    int32_t keyalpha, temp;
-    struct color chromabypass;
+    int32_t keyalpha = 0, temp = 0;
+    struct color chromabypass = { 0 };
 
     wstate->texel0_color = wstate->texel1_color;
     wstate->texel1_color = wstate->nexttexel_color;

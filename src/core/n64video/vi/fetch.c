@@ -32,10 +32,10 @@ static void vi_fetch_filter16(struct rgba* res, uint32_t fboffset, uint32_t cur_
     }
 
 
-    res->r = r;
-    res->g = g;
-    res->b = b;
-    res->a = cur_cvg;
+    res->r = (uint8_t)r;
+    res->g = (uint8_t)g;
+    res->b = (uint8_t)b;
+    res->a = (uint8_t)cur_cvg;
 }
 
 static void vi_fetch_filter32(struct rgba* res, uint32_t fboffset, uint32_t cur_x, struct vi_reg_ctrl ctrl, uint32_t hres, uint32_t fetchstate)
@@ -62,10 +62,10 @@ static void vi_fetch_filter32(struct rgba* res, uint32_t fboffset, uint32_t cur_
         video_filter32(&r, &g, &b, fboffset, cur_x, hres, cur_cvg, fetchstate);
     }
 
-    res->r = r;
-    res->g = g;
-    res->b = b;
-    res->a = cur_cvg;
+    res->r = (uint8_t)r;
+    res->g = (uint8_t)g;
+    res->b = (uint8_t)b;
+    res->a = (uint8_t)cur_cvg;
 }
 
 #endif // N64VIDEO_C

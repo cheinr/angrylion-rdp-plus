@@ -137,7 +137,6 @@ static GLuint gl_shader_compile(GLenum type, const GLchar* source, const char* p
         GLchar log[4096];
         glGetShaderInfoLog(shader, sizeof(log), NULL, log);
         msg_error("%s shader error: %s\n", type == GL_FRAGMENT_SHADER ? "Frag" : "Vert", log);
-        return 0;
     }
 
     return shader;
