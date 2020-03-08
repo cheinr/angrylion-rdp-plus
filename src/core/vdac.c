@@ -228,7 +228,7 @@ void vdac_init(struct n64video_config* config)
     gl_check_errors();
 }
 
-void vdac_read(struct frame_buffer* fb, bool alpha)
+void vdac_read(struct n64video_frame_buffer* fb, bool alpha)
 {
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
@@ -242,7 +242,7 @@ void vdac_read(struct frame_buffer* fb, bool alpha)
     }
 }
 
-void vdac_write(struct frame_buffer* fb)
+void vdac_write(struct n64video_frame_buffer* fb)
 {
     bool buffer_size_changed = m_tex_width != fb->width || m_tex_height != fb->height;
 

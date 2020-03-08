@@ -444,7 +444,7 @@ static bool vi_process_full(void)
     }
 
     // finish and send buffer to screen
-    struct frame_buffer fb;
+    struct n64video_frame_buffer fb;
     fb.pixels = prescale;
     fb.pitch = PRESCALE_WIDTH;
 
@@ -576,7 +576,7 @@ static bool vi_process_fast(void)
     }
 
     // finish and send buffer to screen
-    struct frame_buffer fb;
+    struct n64video_frame_buffer fb;
     fb.pixels = prescale;
     fb.width = hres_raw;
     fb.height = vres_raw;

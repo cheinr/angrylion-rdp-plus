@@ -104,7 +104,7 @@ static void mi_intr(void)
 
 static void write_screenshot(char* path)
 {
-    struct frame_buffer fb = { 0 };
+    struct n64video_frame_buffer fb = { 0 };
     vdac_read(&fb, true);
 
     // prepare bitmap headers

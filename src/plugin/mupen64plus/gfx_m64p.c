@@ -259,7 +259,7 @@ EXPORT void CALL ReadScreen2(void *dest, int *width, int *height, int front)
 {
     UNUSED(front);
 
-    struct frame_buffer fb = { 0 };
+    struct n64video_frame_buffer fb = { 0 };
     fb.pixels = dest;
     vdac_read(&fb, false);
 

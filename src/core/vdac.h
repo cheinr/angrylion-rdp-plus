@@ -13,7 +13,7 @@ struct n64video_pixel
     uint8_t a;
 };
 
-struct frame_buffer
+struct n64video_frame_buffer
 {
     struct n64video_pixel* pixels;
     uint32_t width;
@@ -23,7 +23,7 @@ struct frame_buffer
 };
 
 void vdac_init(struct n64video_config* config);
-void vdac_read(struct frame_buffer* fb, bool alpha);
-void vdac_write(struct frame_buffer* fb);
+void vdac_read(struct n64video_frame_buffer* fb, bool alpha);
+void vdac_write(struct n64video_frame_buffer* fb);
 void vdac_sync(bool invaid);
 void vdac_close(void);
