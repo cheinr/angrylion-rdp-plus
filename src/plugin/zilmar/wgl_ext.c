@@ -1,5 +1,5 @@
 #include "wgl_ext.h"
-#include "core/gl_proc.h"
+#include "output/gl_proc.h"
 
 #include <stdlib.h>
 #include <string.h>

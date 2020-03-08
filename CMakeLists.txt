@@ -90,12 +90,20 @@ endif()
 
 add_library(alp-core STATIC ${SOURCES_CORE} ${PATH_VERSION})
 
+# output library
+set(PATH_OUTPUT "${PATH_SRC}/output")
+
+file(GLOB SOURCES_OUTPUT "${PATH_OUTPUT}/*.c" "${PATH_OUTPUT}/*.cpp")
+
+add_library(alp-output STATIC ${SOURCES_OUTPUT})
+
 if(MINGW)
     # link libgcc/libstdc++ statically, fixes cryptic "_ZNSt13runtime_errorC1EPKc" error
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 else(MINGW)
     # set PIC option for non-MinGW targets
     set_target_properties(alp-core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(alp-output PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif(MINGW)
 
 # set IPO option, if supported
@@ -117,7 +125,7 @@ if(WIN32)
 
     set_target_properties(${NAME_PLUGIN_ZILMAR} PROPERTIES PREFIX "")
 
-    target_link_libraries(${NAME_PLUGIN_ZILMAR} alp-core shlwapi ${OPENGL_LIBRARIES})
+    target_link_libraries(${NAME_PLUGIN_ZILMAR} alp-core alp-output shlwapi ${OPENGL_LIBRARIES})
 endif(WIN32)
 
 # Mupen64Plus GFX plugin
@@ -133,4 +141,4 @@ add_library(${NAME_PLUGIN_M64P} SHARED ${SOURCES_PLUGIN_M64P})
 
 set_target_properties(${NAME_PLUGIN_M64P} PROPERTIES PREFIX "")
 
-target_link_libraries(${NAME_PLUGIN_M64P} alp-core ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES})
+target_link_libraries(${NAME_PLUGIN_M64P} alp-core alp-output ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES})

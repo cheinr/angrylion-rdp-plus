@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\core\gl_core_3_3.c" />
     <ClCompile Include="..\src\core\n64video\rdp.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -32,7 +31,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\src\core\vdac.c" />
     <ClCompile Include="..\src\core\n64video\rdp\blender.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -140,13 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\core\common.h" />
-    <ClInclude Include="..\src\core\gl_core_3_3.h" />
-    <ClInclude Include="..\src\core\gl_proc.h" />
-    <ClInclude Include="..\src\core\vdac.h" />
     <ClInclude Include="..\src\core\msg.h" />
     <ClInclude Include="..\src\core\parallel.h" />
     <ClInclude Include="..\src\core\n64video.h" />
-    <ClInclude Include="..\src\core\screen.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\core\version.h.in" />

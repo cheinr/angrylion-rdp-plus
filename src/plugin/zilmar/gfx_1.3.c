@@ -4,10 +4,11 @@
 
 #include "core/common.h"
 #include "core/n64video.h"
-#include "core/screen.h"
-#include "core/vdac.h"
 #include "core/version.h"
 #include "core/msg.h"
+
+#include "output/screen.h"
+#include "output/vdac.h"
 
 #include <stdio.h>
 #include <ctype.h>
@@ -253,6 +254,8 @@ EXPORT void CALL ProcessRDPList(void)
 
 EXPORT void CALL RomClosed(void)
 {
+    vdac_close();
+    screen_close();
     n64video_close();
 }
 
@@ -279,6 +282,8 @@ EXPORT void CALL RomOpen(void)
     config->gfx.dp_reg = (uint32_t**)&gfx.DPC_START_REG;
 
     n64video_init(config);
+    screen_init(config);
+    vdac_init(config);
 }
 
 EXPORT void CALL ShowCFB(void)
@@ -287,7 +292,14 @@ EXPORT void CALL ShowCFB(void)
 
 EXPORT void CALL UpdateScreen(void)
 {
-    n64video_update_screen();
+    struct n64video_frame_buffer fb;
+    n64video_update_screen(&fb);
+
+    if (fb.valid) {
+        vdac_write(&fb);
+    }
+
+    vdac_sync(fb.valid);
 
     // write screenshot file if requested
     if (m_screenshot_path[0]) {

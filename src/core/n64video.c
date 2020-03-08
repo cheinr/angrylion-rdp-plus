@@ -1,7 +1,6 @@
 #include "n64video.h"
 #include "common.h"
 #include "msg.h"
-#include "vdac.h"
 #include "parallel.h"
 
 #include <memory.h>

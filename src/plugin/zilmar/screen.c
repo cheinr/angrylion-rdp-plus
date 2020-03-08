@@ -2,10 +2,10 @@
 
 #include "wgl_ext.h"
 
+#include "output/screen.h"
+#include "output/gl_proc.h"
 #include "core/common.h"
-#include "core/screen.h"
 #include "core/msg.h"
-#include "core/gl_proc.h"
 
 #include <stdlib.h>
 #include <stdint.h>

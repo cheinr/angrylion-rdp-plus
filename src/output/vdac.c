@@ -1,6 +1,6 @@
 #include "vdac.h"
 #include "screen.h"
-#include "msg.h"
+#include "core/msg.h"
 
 #include <stdlib.h>
 #include <string.h>

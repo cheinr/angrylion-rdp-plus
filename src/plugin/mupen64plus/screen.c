@@ -2,8 +2,9 @@
 #include "api/m64p_vidext.h"
 
 #include "core/common.h"
-#include "core/screen.h"
 #include "core/msg.h"
+
+#include "output/screen.h"
 
 #include <stdlib.h>
 
