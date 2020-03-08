@@ -13,8 +13,8 @@
 #include <ctype.h>
 
 GFX_INFO gfx;
-static bool warn_hle;
-static char screenshot_path[MAX_PATH];
+static bool m_warn_hle;
+static char m_screenshot_path[MAX_PATH];
 
 static bool is_valid_ptr(void *ptr, uint32_t bytes)
 {
@@ -155,7 +155,6 @@ static void write_screenshot(char* path)
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     UNUSED(lpvReserved);
-
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
             config_init(hinstDLL);
@@ -169,8 +168,8 @@ EXPORT void CALL CaptureScreen(char* directory)
     char* rom_name = get_rom_name();
 
     for (int32_t i = 0; i < 10000; i++) {
-        sprintf(screenshot_path, "%s\\%s_%04d.bmp", directory, rom_name, i);
-        DWORD dwAttrib = GetFileAttributes(screenshot_path);
+        sprintf(m_screenshot_path, "%s\\%s_%04d.bmp", directory, rom_name, i);
+        DWORD dwAttrib = GetFileAttributes(m_screenshot_path);
         if (dwAttrib == INVALID_FILE_ATTRIBUTES || (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
             break;
         }
@@ -241,9 +240,9 @@ EXPORT void CALL MoveScreen(int xpos, int ypos)
 
 EXPORT void CALL ProcessDList(void)
 {
-    if (!warn_hle) {
+    if (!m_warn_hle) {
         msg_warning("Please disable 'Graphic HLE' in the plugin settings.");
-        warn_hle = true;
+        m_warn_hle = true;
     }
 }
 
@@ -291,9 +290,9 @@ EXPORT void CALL UpdateScreen(void)
     n64video_update_screen();
 
     // write screenshot file if requested
-    if (screenshot_path[0]) {
-        write_screenshot(screenshot_path);
-        screenshot_path[0] = 0;
+    if (m_screenshot_path[0]) {
+        write_screenshot(m_screenshot_path);
+        m_screenshot_path[0] = 0;
     }
 }
 

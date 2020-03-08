@@ -17,17 +17,17 @@ extern GFX_INFO gfx;
 #define WINDOW_DEFAULT_HEIGHT 480
 
 // previous size of the window
-static int32_t win_width;
-static int32_t win_height;
+static int32_t m_win_width;
+static int32_t m_win_height;
 
 // context states
-static HDC dc;
-static HGLRC glrc;
-static HGLRC glrc_core;
-static bool fullscreen;
+static HDC m_dc;
+static HGLRC m_glrc;
+static HGLRC m_glrc_core;
+static bool m_fullscreen;
 
 // config states
-static bool exclusive;
+static bool m_exclusive;
 
 // Win32 helpers
 void win32_client_resize(HWND hWnd, HWND hStatus, int32_t nWidth, int32_t nHeight)
@@ -81,14 +81,14 @@ void* IntGetProcAddress(const char *name)
 
 void screen_init(struct n64video_config* config)
 {
-    exclusive = config->vi.exclusive;
+    m_exclusive = config->vi.exclusive;
 
     // reset windowed size state
-    win_width = 0;
-    win_height = 0;
+    m_win_width = 0;
+    m_win_height = 0;
 
     // make window resizable for the user
-    if (!fullscreen) {
+    if (!m_fullscreen) {
         LONG style = GetWindowLong(gfx.hWnd, GWL_STYLE);
 
         if ((style & (WS_SIZEBOX | WS_MAXIMIZEBOX)) == 0) {
@@ -117,28 +117,28 @@ void screen_init(struct n64video_config* config)
         PFD_MAIN_PLANE, 0, 0, 0, 0
     };
 
-    dc = GetDC(gfx.hWnd);
-    if (!dc) {
+    m_dc = GetDC(gfx.hWnd);
+    if (!m_dc) {
         msg_error("Can't get device context.");
         return;
     }
 
-    int32_t win_pf = ChoosePixelFormat(dc, &win_pfd);
+    int32_t win_pf = ChoosePixelFormat(m_dc, &win_pfd);
     if (!win_pf) {
         msg_error("Can't choose pixel format.");
         return;
     }
-    SetPixelFormat(dc, win_pf, &win_pfd);
+    SetPixelFormat(m_dc, win_pf, &win_pfd);
 
     // create legacy context, required for wglGetProcAddress to work properly
-    glrc = wglCreateContext(dc);
-    if (!glrc || !wglMakeCurrent(dc, glrc)) {
+    m_glrc = wglCreateContext(m_dc);
+    if (!m_glrc || !wglMakeCurrent(m_dc, m_glrc)) {
         msg_error("Can't create OpenGL context.");
         return;
     }
 
     // load wgl extension
-    wgl_LoadFunctions(dc);
+    wgl_LoadFunctions(m_dc);
 
     // attributes for a 3.3 core profile without all the legacy stuff
     GLint attribs[] = {
@@ -149,8 +149,8 @@ void screen_init(struct n64video_config* config)
     };
 
     // create the actual context
-    glrc_core = wglCreateContextAttribsARB(dc, glrc, attribs);
-    if (!glrc_core || !wglMakeCurrent(dc, glrc_core)) {
+    m_glrc_core = wglCreateContextAttribsARB(m_dc, m_glrc, attribs);
+    if (!m_glrc_core || !wglMakeCurrent(m_dc, m_glrc_core)) {
         // rendering probably still works with the legacy context, so just send
         // a warning
         msg_warning("Can't create OpenGL 3.3 core context.");
@@ -208,7 +208,7 @@ void screen_adjust(int32_t width_out, int32_t height_out, int32_t* width, int32_
         GetWindowPlacement(gfx.hWnd, &wndpl);
 
         // only fix size if windowed and not maximized
-        if (!fullscreen && wndpl.showCmd != SW_MAXIMIZE) {
+        if (!m_fullscreen && wndpl.showCmd != SW_MAXIMIZE) {
             win32_client_resize(gfx.hWnd, gfx.hStatusBar,
                 win_width_tmp, win_height_tmp);
         }
@@ -225,7 +225,7 @@ void screen_update(void)
     // don't render when the window is minimized
     if (!IsIconic(gfx.hWnd)) {
         // swap front and back buffers
-        SwapBuffers(dc);
+        SwapBuffers(m_dc);
     }
 }
 
@@ -235,9 +235,9 @@ void screen_toggle_fullscreen(void)
     static LONG old_style;
     static WINDOWPLACEMENT old_pos;
 
-    fullscreen = !fullscreen;
+    m_fullscreen = !m_fullscreen;
 
-    if (fullscreen) {
+    if (m_fullscreen) {
         // hide curser
         ShowCursor(FALSE);
 
@@ -263,7 +263,7 @@ void screen_toggle_fullscreen(void)
         // it later
         old_style = GetWindowLong(gfx.hWnd, GWL_STYLE);
         LONG style = WS_VISIBLE;
-        if (exclusive) {
+        if (m_exclusive) {
             style |= WS_POPUP;
         }
         SetWindowLong(gfx.hWnd, GWL_STYLE, style);
@@ -296,9 +296,9 @@ void screen_toggle_fullscreen(void)
 
 void screen_close(void)
 {
-    if (glrc_core) {
-        wglDeleteContext(glrc_core);
+    if (m_glrc_core) {
+        wglDeleteContext(m_glrc_core);
     }
 
-    wglDeleteContext(glrc);
+    wglDeleteContext(m_glrc);
 }
