@@ -2,6 +2,7 @@
 
 #include "wgl_ext.h"
 
+#include "core/common.h"
 #include "core/screen.h"
 #include "core/msg.h"
 
@@ -161,6 +162,9 @@ void screen_init(struct n64video_config* config)
 
 void screen_adjust(int32_t width_out, int32_t height_out, int32_t* width, int32_t* height, int32_t* x, int32_t* y)
 {
+    UNUSED(width_out);
+    UNUSED(height_out);
+
     // get size of window
     RECT rect;
     if (!GetClientRect(gfx.hWnd, &rect)) {

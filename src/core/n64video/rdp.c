@@ -574,26 +574,39 @@ void rdp_init(struct rdp_state* wstate)
 
 void rdp_invalid(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
 }
 
 void rdp_noop(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
 }
 
 void rdp_sync_load(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
 }
 
 void rdp_sync_pipe(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
 }
 
 void rdp_sync_tile(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
 }
 
 void rdp_sync_full(struct rdp_state* wstate, const uint32_t* args)
 {
+    UNUSED(wstate);
+    UNUSED(args);
+
     // signal DP interrupt
     *config.gfx.mi_intr_reg |= DP_INTERRUPT;
     config.gfx.mi_intr_cb();

@@ -45,6 +45,7 @@
 #include "api/m64p_types.h"
 #include "api/m64p_config.h"
 
+#include "core/common.h"
 #include "core/screen.h"
 #include "core/vdac.h"
 #include "core/version.h"
@@ -173,6 +174,8 @@ EXPORT int CALL InitiateGFX (GFX_INFO Gfx_Info)
 
 EXPORT void CALL MoveScreen (int xpos, int ypos)
 {
+    UNUSED(xpos);
+    UNUSED(ypos);
 }
 
 EXPORT void CALL ProcessDList(void)
@@ -254,6 +257,8 @@ EXPORT void CALL ChangeWindow(void)
 
 EXPORT void CALL ReadScreen2(void *dest, int *width, int *height, int front)
 {
+    UNUSED(front);
+
     struct frame_buffer fb = { 0 };
     fb.pixels = dest;
     vdac_read(&fb, false);
@@ -275,12 +280,16 @@ EXPORT void CALL ResizeVideoOutput(int width, int height)
 
 EXPORT void CALL FBWrite(unsigned int addr, unsigned int size)
 {
+    UNUSED(addr);
+    UNUSED(size);
 }
 
 EXPORT void CALL FBRead(unsigned int addr)
 {
+    UNUSED(addr);
 }
 
 EXPORT void CALL FBGetFrameBufferInfo(void *pinfo)
 {
+    UNUSED(pinfo);
 }

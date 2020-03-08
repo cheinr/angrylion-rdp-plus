@@ -470,6 +470,10 @@ static STRICTINLINE void tclod_2cycle(struct rdp_state* wstate, int32_t* sss, in
 
 static STRICTINLINE void tclod_2cycle_next(struct rdp_state* wstate, int32_t* sss, int32_t* sst, int32_t* sss2, int32_t* sst2, int32_t s, int32_t t, int32_t w, int32_t dsinc, int32_t dtinc, int32_t dwinc, int32_t prim_tile, int32_t* t1, int32_t* t2, int32_t* lf, int scanline)
 {
+    UNUSED(s);
+    UNUSED(t);
+    UNUSED(w);
+
     int nextys, nextyt, nextysw;
     int nexts, nextt, nextsw;
     int lodclamp = 0;
@@ -1013,7 +1017,7 @@ static STRICTINLINE void tc_pipeline_load(struct tile* tile, int32_t* sss, int32
 
 static void tcdiv_nopersp(int32_t ss, int32_t st, int32_t sw, int32_t* sss, int32_t* sst)
 {
-
+    UNUSED(sw);
 
 
     *sss = (SIGN16(ss)) & 0x1ffff;

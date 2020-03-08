@@ -154,6 +154,8 @@ static void write_screenshot(char* path)
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
+    UNUSED(lpvReserved);
+
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
             config_init(hinstDLL);
@@ -186,6 +188,8 @@ EXPORT void CALL CloseDLL(void)
 
 EXPORT void CALL DllAbout(HWND hParent)
 {
+    UNUSED(hParent);
+
     msg_warning(
         CORE_NAME "\n\n"
         "Branch: " GIT_BRANCH "\n"
@@ -203,6 +207,9 @@ EXPORT void CALL DllConfig(HWND hParent)
 
 EXPORT void CALL ReadScreen(void **dest, long *width, long *height)
 {
+    UNUSED(dest);
+    UNUSED(width);
+    UNUSED(height);
 }
 
 EXPORT void CALL DrawScreen(void)
@@ -228,6 +235,8 @@ EXPORT BOOL CALL InitiateGFX(GFX_INFO Gfx_Info)
 
 EXPORT void CALL MoveScreen(int xpos, int ypos)
 {
+    UNUSED(xpos);
+    UNUSED(ypos);
 }
 
 EXPORT void CALL ProcessDList(void)
@@ -298,16 +307,22 @@ EXPORT void CALL ViWidthChanged(void)
 
 EXPORT void CALL FBWrite(DWORD addr, DWORD val)
 {
+    UNUSED(addr);
+    UNUSED(val);
 }
 
 EXPORT void CALL FBWList(FrameBufferModifyEntry *plist, DWORD size)
 {
+    UNUSED(plist);
+    UNUSED(size);
 }
 
 EXPORT void CALL FBRead(DWORD addr)
 {
+    UNUSED(addr);
 }
 
 EXPORT void CALL FBGetFrameBufferInfo(void *pinfo)
 {
+    UNUSED(pinfo);
 }

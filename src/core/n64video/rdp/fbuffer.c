@@ -30,12 +30,25 @@ static void (*fbwrite_func[4])(struct rdp_state*, uint32_t, uint32_t, uint32_t, 
 
 static void fbwrite_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, uint32_t g, uint32_t b, uint32_t blend_en, uint32_t curpixel_cvg, uint32_t curpixel_memcvg)
 {
+    UNUSED(r);
+    UNUSED(g);
+    UNUSED(b);
+    UNUSED(blend_en);
+    UNUSED(curpixel_cvg);
+    UNUSED(curpixel_memcvg);
+
     uint32_t fb = wstate->fb_address + curpixel;
     RWRITEADDR8(fb, 0);
 }
 
 static void fbwrite_8(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, uint32_t g, uint32_t b, uint32_t blend_en, uint32_t curpixel_cvg, uint32_t curpixel_memcvg)
 {
+    UNUSED(g);
+    UNUSED(b);
+    UNUSED(blend_en);
+    UNUSED(curpixel_cvg);
+    UNUSED(curpixel_memcvg);
+
     uint32_t fb = wstate->fb_address + curpixel;
     PAIRWRITE8(fb, r & 0xff, (r & 1) ? 3 : 0);
 }
@@ -87,6 +100,9 @@ static void fbwrite_32(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, 
 
 static void fbfill_4(struct rdp_state* wstate, uint32_t curpixel)
 {
+    UNUSED(wstate);
+    UNUSED(curpixel);
+
     rdp_pipeline_crashed = 1;
 }
 
@@ -119,6 +135,8 @@ static void fbfill_32(struct rdp_state* wstate, uint32_t curpixel)
 
 static void fbread_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
+    UNUSED(curpixel);
+
     wstate->memory_color.r = wstate->memory_color.g = wstate->memory_color.b = 0;
 
     *curpixel_memcvg = 7;
@@ -127,6 +145,8 @@ static void fbread_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curp
 
 static void fbread2_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
+    UNUSED(curpixel);
+
     wstate->pre_memory_color.r = wstate->pre_memory_color.g = wstate->pre_memory_color.b = 0;
     wstate->pre_memory_color.a = 0xe0;
     *curpixel_memcvg = 7;

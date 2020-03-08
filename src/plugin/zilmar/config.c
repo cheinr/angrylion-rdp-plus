@@ -1,6 +1,7 @@
 #include "config.h"
 #include "resource.h"
 
+#include "core/common.h"
 #include "core/version.h"
 
 #include <Commctrl.h>
@@ -74,6 +75,8 @@ static void config_dialog_fill_combo(HWND dialog, char** entries, size_t num_ent
 
 INT_PTR CALLBACK config_dialog_proc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
+    UNUSED(lParam);
+
     switch (iMessage) {
         case WM_INITDIALOG: {
             SetWindowText(hwnd, CORE_BASE_NAME " Config");
