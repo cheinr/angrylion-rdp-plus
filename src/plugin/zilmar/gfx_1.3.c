@@ -140,7 +140,7 @@ static void write_screenshot(char* path)
 
     // convert RGBA to BGRA
     for (uint32_t i = 0; i < fb.width * fb.height; i++) {
-        struct rgba* pixel = &fb.pixels[i];
+        struct n64video_pixel* pixel = &fb.pixels[i];
         uint8_t tmp = pixel->r;
         pixel->r = pixel->b;
         pixel->b = tmp;

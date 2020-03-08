@@ -48,7 +48,7 @@ struct vi_reg_ctrl
     bool dither_filter_enable;
 };
 
-typedef void(*vi_fetch_filter_func)(struct rgba*, uint32_t, uint32_t, struct vi_reg_ctrl, uint32_t, uint32_t);
+typedef void(*vi_fetch_filter_func)(struct n64video_pixel*, uint32_t, uint32_t, struct vi_reg_ctrl, uint32_t, uint32_t);
 
 #include "vi/gamma.c"
 #include "vi/lerp.c"
@@ -79,7 +79,7 @@ static uint32_t tvfadeoutstate[PRESCALE_HEIGHT];
 static uint32_t zb_address;
 
 // prescale buffer
-static struct rgba prescale[PRESCALE_WIDTH * PRESCALE_HEIGHT];
+static struct n64video_pixel prescale[PRESCALE_WIDTH * PRESCALE_HEIGHT];
 static uint32_t prescale_ptr;
 static int32_t linecount;
 
@@ -112,18 +112,18 @@ static void vi_init(void)
 static void vi_process_full_parallel(uint32_t worker_id)
 {
     int32_t y;
-    struct rgba viaa_array[0xa10 << 1];
-    struct rgba divot_array[0xa10 << 1];
+    struct n64video_pixel viaa_array[0xa10 << 1];
+    struct n64video_pixel divot_array[0xa10 << 1];
 
     int32_t cache_marker = 0, cache_next_marker = 0, divot_cache_marker = 0, divot_cache_next_marker = 0;
     int32_t cache_marker_init = (x_start >> 10) - 1;
 
-    struct rgba *viaa_cache = &viaa_array[0];
-    struct rgba *viaa_cache_next = &viaa_array[0xa10];
-    struct rgba *divot_cache = &divot_array[0];
-    struct rgba *divot_cache_next = &divot_array[0xa10];
+    struct n64video_pixel *viaa_cache = &viaa_array[0];
+    struct n64video_pixel *viaa_cache_next = &viaa_array[0xa10];
+    struct n64video_pixel *divot_cache = &divot_array[0];
+    struct n64video_pixel *divot_cache_next = &divot_array[0xa10];
 
-    struct rgba color, nextcolor, scancolor, scannextcolor;
+    struct n64video_pixel color, nextcolor, scancolor, scannextcolor;
 
     vi_fetch_filter_func vi_fetch_filter_ptr = ctrl.type & 1 ? vi_fetch_filter32 : vi_fetch_filter16;
 
@@ -159,7 +159,7 @@ static void vi_process_full_parallel(uint32_t worker_id)
             divot_cache_marker = divot_cache_next_marker = cache_marker_init;
         }
 
-        struct rgba* pixel_row = &prescale[prescale_ptr + linecount * y];
+        struct n64video_pixel* pixel_row = &prescale[prescale_ptr + linecount * y];
 
         yfrac = (curry >> 5) & 0x1f;
         pixels = vi_width_low * prevy;
@@ -274,7 +274,7 @@ static void vi_process_full_parallel(uint32_t worker_id)
                 vi_vl_lerp(&color, nextcolor, xfrac);
             }
 
-            struct rgba* pixel = &pixel_row[x];
+            struct n64video_pixel* pixel = &pixel_row[x];
 
             if (x >= minhpass && x < maxhpass) {
                 *pixel = color;
@@ -288,7 +288,7 @@ static void vi_process_full_parallel(uint32_t worker_id)
             cache_marker = cache_next_marker;
             cache_next_marker = cache_marker_init;
 
-            struct rgba* tempccvgptr = viaa_cache;
+            struct n64video_pixel* tempccvgptr = viaa_cache;
             viaa_cache = viaa_cache_next;
             viaa_cache_next = tempccvgptr;
             if (ctrl.divot_enable) {
@@ -497,10 +497,10 @@ static void vi_process_fast_parallel(uint32_t worker_id)
         int32_t x;
         int32_t line = y * vi_width_low;
 
-        struct rgba* pixel_row = &prescale[y * hres_raw];
+        struct n64video_pixel* pixel_row = &prescale[y * hres_raw];
 
         for (x = 0; x < hres_raw; x++) {
-            struct rgba* pixel = &pixel_row[x];
+            struct n64video_pixel* pixel = &pixel_row[x];
 
             switch (config.vi.mode) {
                 case VI_MODE_COLOR:

@@ -23,7 +23,7 @@ static uint32_t vi_integer_sqrt(uint32_t a)
     return res;
 }
 
-static STRICTINLINE void gamma_filters(struct rgba* pixel, bool gamma_enable, bool gamma_dither_enable, uint32_t* rstate)
+static STRICTINLINE void gamma_filters(struct n64video_pixel* pixel, bool gamma_enable, bool gamma_dither_enable, uint32_t* rstate)
 {
     int cdith, dith;
 

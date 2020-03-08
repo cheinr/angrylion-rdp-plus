@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct rgba
+struct n64video_pixel
 {
     uint8_t r;
     uint8_t g;
@@ -15,7 +15,7 @@ struct rgba
 
 struct frame_buffer
 {
-    struct rgba* pixels;
+    struct n64video_pixel* pixels;
     uint32_t width;
     uint32_t height;
     uint32_t height_out;
