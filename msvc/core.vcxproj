@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\core\common.h" />
     <ClInclude Include="..\src\core\gl_core_3_3.h" />
+    <ClInclude Include="..\src\core\gl_proc.h" />
     <ClInclude Include="..\src\core\vdac.h" />
     <ClInclude Include="..\src\core\msg.h" />
     <ClInclude Include="..\src\core\parallel.h" />

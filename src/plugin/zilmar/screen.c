@@ -5,6 +5,7 @@
 #include "core/common.h"
 #include "core/screen.h"
 #include "core/msg.h"
+#include "core/gl_proc.h"
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -65,17 +66,17 @@ static int TestPointer(const PROC pTest)
     return iTest != 1 && iTest != 2 && iTest != 3 && iTest != -1;
 }
 
-void* IntGetProcAddress(const char *name)
+funcptr IntGetProcAddress(const char* name)
 {
     PROC pFunc = wglGetProcAddress((LPCSTR)name);
     if (TestPointer(pFunc)) {
-        return pFunc;
+        return (funcptr)pFunc;
     }
     HMODULE glMod = GetModuleHandleA("OpenGL32.dll");
     if (glMod == NULL) {
-        return glMod;
+        return (funcptr)glMod;
     } else {
-        return (PROC)GetProcAddress(glMod, (LPCSTR)name);
+        return (funcptr)GetProcAddress(glMod, (LPCSTR)name);
     }
 }
 
