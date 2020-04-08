@@ -129,16 +129,15 @@ if(WIN32)
 endif(WIN32)
 
 # Mupen64Plus GFX plugin
-if (ANDROID)
-    set(NAME_PLUGIN_M64P "libmupen64plus-video-${CMAKE_PROJECT_NAME}")
-else()
-    set(NAME_PLUGIN_M64P "mupen64plus-video-${CMAKE_PROJECT_NAME}")
-endif()
+set(NAME_PLUGIN_M64P "mupen64plus-video-${CMAKE_PROJECT_NAME}")
+
 set(PATH_PLUGIN_M64P "${PATH_SRC}/plugin/mupen64plus")
 
 file(GLOB SOURCES_PLUGIN_M64P "${PATH_PLUGIN_M64P}/*.c")
 add_library(${NAME_PLUGIN_M64P} SHARED ${SOURCES_PLUGIN_M64P})
 
-set_target_properties(${NAME_PLUGIN_M64P} PROPERTIES PREFIX "")
+if(NOT ANDROID)
+    set_target_properties(${NAME_PLUGIN_M64P} PROPERTIES PREFIX "")
+endif()
 
 target_link_libraries(${NAME_PLUGIN_M64P} alp-core alp-output ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES})
