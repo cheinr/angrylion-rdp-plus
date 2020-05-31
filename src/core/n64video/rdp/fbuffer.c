@@ -43,14 +43,13 @@ static void fbwrite_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, u
 
 static void fbwrite_8(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, uint32_t g, uint32_t b, uint32_t blend_en, uint32_t curpixel_cvg, uint32_t curpixel_memcvg)
 {
-    UNUSED(g);
     UNUSED(b);
     UNUSED(blend_en);
     UNUSED(curpixel_cvg);
     UNUSED(curpixel_memcvg);
 
     uint32_t fb = wstate->fb_address + curpixel;
-    PAIRWRITE8(fb, r & 0xff, (r & 1) ? 3 : 0);
+    PAIRWRITE8(fb, (fb & 1) ? (g & 0xff) : (r & 0xff));
 }
 
 static void fbwrite_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t r, uint32_t g, uint32_t b, uint32_t blend_en, uint32_t curpixel_cvg, uint32_t curpixel_memcvg)
@@ -110,8 +109,7 @@ static void fbfill_8(struct rdp_state* wstate, uint32_t curpixel)
 {
     uint32_t fb = wstate->fb_address + curpixel;
     uint8_t val = (wstate->fill_color >> ((fb & 3) ^ 3) << 3) & 0xff;
-    uint8_t hval = ((val & 1) << 1) | (val & 1);
-    PAIRWRITE8(fb, val, hval);
+    PAIRWRITE8(fb, val);
 }
 
 static void fbfill_16(struct rdp_state* wstate, uint32_t curpixel)
@@ -154,35 +152,41 @@ static void fbread2_4(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cur
 
 static void fbread_8(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint8_t mem;
-    uint32_t addr = wstate->fb_address + curpixel;
-    RREADADDR8(mem, addr);
-    wstate->memory_color.r = wstate->memory_color.g = wstate->memory_color.b = mem;
+    if (wstate->other_modes.image_read_en)
+    {
+        uint8_t mem;
+        uint32_t addr = wstate->fb_address + curpixel;
+        RREADADDR8(mem, addr);
+        wstate->memory_color.r = wstate->memory_color.g = wstate->memory_color.b = mem;
+    }
+
     *curpixel_memcvg = 7;
     wstate->memory_color.a = 0xe0;
 }
 
 static void fbread2_8(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint8_t mem;
-    uint32_t addr = wstate->fb_address + curpixel;
-    RREADADDR8(mem, addr);
-    wstate->pre_memory_color.r = wstate->pre_memory_color.g = wstate->pre_memory_color.b = mem;
+    if (wstate->other_modes.image_read_en)
+    {
+        uint8_t mem;
+        uint32_t addr = wstate->fb_address + curpixel;
+        RREADADDR8(mem, addr);
+        wstate->pre_memory_color.r = wstate->pre_memory_color.g = wstate->pre_memory_color.b = mem;
+    }
     wstate->pre_memory_color.a = 0xe0;
     *curpixel_memcvg = 7;
 }
 
 static void fbread_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint16_t fword;
-    uint8_t hbyte;
-    uint32_t addr = (wstate->fb_address >> 1) + curpixel;
-
-    uint8_t lowbits;
-
-
     if (wstate->other_modes.image_read_en)
     {
+        uint16_t fword;
+        uint8_t hbyte;
+        uint32_t addr = (wstate->fb_address >> 1) + curpixel;
+
+        uint8_t lowbits;
+
         PAIRREAD16(fword, hbyte, addr);
 
         if (wstate->fb_format == FORMAT_RGBA)
@@ -203,17 +207,6 @@ static void fbread_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cur
     }
     else
     {
-        RREADIDX16(fword, addr);
-
-        if (wstate->fb_format == FORMAT_RGBA)
-        {
-            wstate->memory_color.r = RGBA16_R(fword);
-            wstate->memory_color.g = RGBA16_G(fword);
-            wstate->memory_color.b = RGBA16_B(fword);
-        }
-        else
-            wstate->memory_color.r = wstate->memory_color.g = wstate->memory_color.b = fword >> 8;
-
         *curpixel_memcvg = 7;
         wstate->memory_color.a = 0xe0;
     }
@@ -221,14 +214,15 @@ static void fbread_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cur
 
 static void fbread2_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint16_t fword;
-    uint8_t hbyte;
-    uint32_t addr = (wstate->fb_address >> 1) + curpixel;
-
-    uint8_t lowbits;
 
     if (wstate->other_modes.image_read_en)
     {
+        uint16_t fword;
+        uint8_t hbyte;
+        uint32_t addr = (wstate->fb_address >> 1) + curpixel;
+
+        uint8_t lowbits;
+
         PAIRREAD16(fword, hbyte, addr);
 
         if (wstate->fb_format == FORMAT_RGBA)
@@ -249,17 +243,6 @@ static void fbread2_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cu
     }
     else
     {
-        RREADIDX16(fword, addr);
-
-        if (wstate->fb_format == FORMAT_RGBA)
-        {
-            wstate->pre_memory_color.r = RGBA16_R(fword);
-            wstate->pre_memory_color.g = RGBA16_G(fword);
-            wstate->pre_memory_color.b = RGBA16_B(fword);
-        }
-        else
-            wstate->pre_memory_color.r = wstate->pre_memory_color.g = wstate->pre_memory_color.b = fword >> 8;
-
         *curpixel_memcvg = 7;
         wstate->pre_memory_color.a = 0xe0;
     }
@@ -268,13 +251,14 @@ static void fbread2_16(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cu
 
 static void fbread_32(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint32_t mem, addr = (wstate->fb_address >> 2) + curpixel;
-    RREADIDX32(mem, addr);
-    wstate->memory_color.r = RGBA32_R(mem);
-    wstate->memory_color.g = RGBA32_G(mem);
-    wstate->memory_color.b = RGBA32_B(mem);
     if (wstate->other_modes.image_read_en)
     {
+        uint32_t mem, addr = (wstate->fb_address >> 2) + curpixel;
+        RREADIDX32(mem, addr);
+        wstate->memory_color.r = RGBA32_R(mem);
+        wstate->memory_color.g = RGBA32_G(mem);
+        wstate->memory_color.b = RGBA32_B(mem);
+
         *curpixel_memcvg = (mem >> 5) & 7;
         wstate->memory_color.a = mem & 0xe0;
     }
@@ -287,13 +271,15 @@ static void fbread_32(struct rdp_state* wstate, uint32_t curpixel, uint32_t* cur
 
 static INLINE void fbread2_32(struct rdp_state* wstate, uint32_t curpixel, uint32_t* curpixel_memcvg)
 {
-    uint32_t mem, addr = (wstate->fb_address >> 2) + curpixel;
-    RREADIDX32(mem, addr);
-    wstate->pre_memory_color.r = RGBA32_R(mem);
-    wstate->pre_memory_color.g = RGBA32_G(mem);
-    wstate->pre_memory_color.b = RGBA32_B(mem);
     if (wstate->other_modes.image_read_en)
     {
+        uint32_t mem, addr = (wstate->fb_address >> 2) + curpixel;
+        RREADIDX32(mem, addr);
+
+        wstate->pre_memory_color.r = RGBA32_R(mem);
+        wstate->pre_memory_color.g = RGBA32_G(mem);
+        wstate->pre_memory_color.b = RGBA32_B(mem);
+
         *curpixel_memcvg = (mem >> 5) & 7;
         wstate->pre_memory_color.a = mem & 0xe0;
     }

@@ -776,7 +776,7 @@ static void render_spans_2cycle_complete(struct rdp_state* wstate, int start, in
     int sr, sg, sb, sa, sz, ss, st, sw;
     int xstart, xend, xendsc;
     int sss = 0, sst = 0;
-    int curpixel = 0;
+    uint32_t curpixel = 0;
     int wen;
 
     int x, length, scdiff, lodlength;
@@ -1819,7 +1819,7 @@ static void render_spans_copy(struct rdp_state* wstate, int start, int end, int 
                 tempbyte = (uint8_t)((copyqword >> (k << 3)) & 0xff);
                 if (alphamask & (1 << k))
                 {
-                    PAIRWRITE8(tempdword, tempbyte, (tempbyte & 1) ? 3 : 0);
+                    PAIRWRITE8(tempdword, tempbyte);
                 }
                 k--;
                 tempdword += xinc;
