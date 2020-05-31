@@ -159,7 +159,6 @@ void n64video_config_init(struct n64video_config* conf)
     // config defaults that aren't false or 0
     conf->parallel = true;
     conf->vi.vsync = true;
-    conf->dp.compat = DP_COMPAT_MEDIUM;
 }
 
 static void n64video_init_parallel(uint32_t worker_id)
