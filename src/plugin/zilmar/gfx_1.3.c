@@ -255,7 +255,6 @@ EXPORT void CALL ProcessRDPList(void)
 EXPORT void CALL RomClosed(void)
 {
     vdac_close();
-    screen_close();
     n64video_close();
 }
 
@@ -282,7 +281,6 @@ EXPORT void CALL RomOpen(void)
     config->gfx.dp_reg = (uint32_t**)&gfx.DPC_START_REG;
 
     n64video_init(config);
-    screen_init(config);
     vdac_init(config);
 }
 
