@@ -52,6 +52,7 @@ enum vi_interp
 {
     VI_INTERP_NEAREST,
     VI_INTERP_LINEAR,
+    VI_INTERP_HYBRID,
     VI_INTERP_NUM
 };
 

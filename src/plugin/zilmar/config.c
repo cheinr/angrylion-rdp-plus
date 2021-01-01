@@ -97,8 +97,9 @@ INT_PTR CALLBACK config_dialog_proc(HWND hwnd, UINT iMessage, WPARAM wParam, LPA
             config_dialog_fill_combo(dlg_combo_vi_mode, vi_mode_strings, VI_MODE_NUM, config.vi.mode);
 
             char* vi_interp_strings[] = {
-                "Nearest-neighbor", // VI_INTERP_NEAREST
-                "Linear"            // VI_INTERP_LINEAR
+                "Blocky (nearest-neightbor)",   // VI_INTERP_NEAREST
+                "Blurry (bilinear)",            // VI_INTERP_LINEAR
+                "Soft (bilinear + NN)"          // VI_INTERP_HYBRID
             };
 
             dlg_combo_vi_interp = GetDlgItem(hwnd, IDC_COMBO_VI_INTERP);
