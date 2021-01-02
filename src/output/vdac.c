@@ -19,6 +19,7 @@
 
 static bool m_fbo_enabled;
 static GLuint m_fbo;
+static bool m_integer_scaling;
 
 static GLuint m_fbtex;
 static uint32_t m_fbtex_width;
@@ -278,6 +279,9 @@ void vdac_init(struct n64video_config* config)
     // read with exact FB size in non-filtered modes
     m_rawtex_read = config->vi.mode != VI_MODE_NORMAL;
 
+    // save integer scaling flag, will be used later
+    m_integer_scaling = config->vi.integer_scaling;
+
     // check if there was an error when using any of the commands above
     gl_check_errors();
 }
@@ -393,19 +397,37 @@ void vdac_sync(bool valid)
         return;
     }
 
-    int32_t hw = m_fbtex_height * win_width;
-    int32_t wh = m_fbtex_width * win_height;
+    if (m_integer_scaling) {
+        // get smallest integer scale that is at least 1
+        uint32_t scale_x = (uint32_t)win_width < m_fbtex_width ? 1 : (uint32_t)win_width / m_fbtex_width;
+        uint32_t scale_y = (uint32_t)win_height < m_fbtex_height ? 1 : (uint32_t)win_height / m_fbtex_height;
+        uint32_t scale = scale_x > scale_y ? scale_x : scale_y;
 
-    // add letterboxes or pillarboxes if the window has a different aspect ratio
-    // than the current display mode
-    if (hw > wh) {
-        int32_t w_max = wh / m_fbtex_height;
-        win_x += (win_width - w_max) / 2;
-        win_width = w_max;
-    } else if (hw < wh) {
-        int32_t h_max = hw / m_fbtex_width;
-        win_y += (win_height - h_max) / 2;
-        win_height = h_max;
+        // get new window size (or rather viewport size in this context)
+        int32_t win_width_new = m_fbtex_width * scale;
+        int32_t win_height_new = m_fbtex_height * scale;
+
+        // apply new size and offset
+        win_x = (win_width - win_width_new) / 2;
+        win_y = (win_height - win_height_new) / 2;
+
+        win_width = win_width_new;
+        win_height = win_height_new;
+    } else {
+        int32_t hw = m_fbtex_height * win_width;
+        int32_t wh = m_fbtex_width * win_height;
+
+        // add letterboxes or pillarboxes if the window has a different aspect ratio
+        // than the current display mode
+        if (hw > wh) {
+            int32_t w_max = wh / m_fbtex_height;
+            win_x += (win_width - w_max) / 2;
+            win_width = w_max;
+        } else if (hw < wh) {
+            int32_t h_max = hw / m_fbtex_width;
+            win_y += (win_height - h_max) / 2;
+            win_height = h_max;
+        }
     }
 
     if (m_fbo_enabled) {

@@ -100,6 +100,7 @@ struct n64video_config
         bool hide_overscan;         // crop to visible area if true
         bool vsync;                 // enable vsync if true
         bool exclusive;             // run in exclusive mode when in fullscreen if true
+        bool integer_scaling;       // one native pixel is displayed as a multiple of a screen pixel if true
     } vi;
     struct {
         enum dp_compat_profile compat;  // multithreading compatibility mode
