@@ -103,7 +103,7 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
     ConfigGetParamBool = (ptr_ConfigGetParamBool)DLSYM(CoreLibHandle, "ConfigGetParamBool");
 
     ConfigOpenSection("Video-General", &configVideoGeneral);
-    ConfigOpenSection("Video-Angrylion-Plus", &configVideoAngrylionPlus);
+    ConfigOpenSection("Video-AngrylionPlus", &configVideoAngrylionPlus);
 
     ConfigSetDefaultBool(configVideoGeneral, KEY_FULLSCREEN, 0, "Use fullscreen mode if True, or windowed mode if False");
     ConfigSetDefaultInt(configVideoGeneral, KEY_SCREEN_WIDTH, 640, "Width of output window or fullscreen width");
@@ -124,7 +124,7 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
     ConfigSetDefaultInt(configVideoAngrylionPlus, KEY_DP_COMPAT, config.dp.compat, "Compatibility mode (0=Fast 1=Moderate 2=Slow");
 
     ConfigSaveSection("Video-General");
-    ConfigSaveSection("Video-Angrylion-Plus");
+    ConfigSaveSection("Video-AngrylionPlus");
 
     plugin_initialized = true;
     return M64ERR_SUCCESS;
