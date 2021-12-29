@@ -75,8 +75,8 @@ void (*render_callback)(int);
 static m64p_handle configVideoGeneral = NULL;
 static m64p_handle configVideoAngrylionPlus = NULL;
 
-#define PLUGIN_VERSION              0x000100
-#define VIDEO_PLUGIN_API_VERSION    0x020200
+#define PLUGIN_VERSION              0x010600
+#define VIDEO_PLUGIN_API_VERSION    0x020500
 
 extern int32_t win_width;
 extern int32_t win_height;
@@ -160,7 +160,7 @@ EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *Plugi
     }
 
     if (PluginNamePtr != NULL) {
-        *PluginNamePtr = CORE_NAME;
+        *PluginNamePtr = CORE_BASE_NAME;
     }
 
     if (Capabilities != NULL) {
