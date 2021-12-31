@@ -49,6 +49,12 @@ make
 
 To create an OpenGL ES 3 build, add ``-DGLES=ON`` to the cmake arguments.
 
+Installing:
+
+```bash
+sudo make install
+```
+
 ### Credits
 * Angrylion, Ville Linde, MooglyGuy and others involved for creating an awesome N64 RDP reference software.
 * theboy181 - Testing. Lots of testing.
