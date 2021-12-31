@@ -29,7 +29,7 @@ int32_t win_fullscreen;
 
 void* IntGetProcAddress(const char *name)
 {
-    return CoreVideo_GL_GetProcAddress(name);
+    return (void*)CoreVideo_GL_GetProcAddress(name);
 }
 
 void screen_init(struct n64video_config* config)
