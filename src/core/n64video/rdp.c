@@ -307,7 +307,8 @@ struct rdp_state
     // fbuffer
     void (*fbread1_ptr)(struct rdp_state*, uint32_t, uint32_t*);
     void (*fbread2_ptr)(struct rdp_state*, uint32_t, uint32_t*);
-    void (*fbwrite_ptr)(struct rdp_state*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+    void (*fbwrite_ptr)(struct rdp_state*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, int, int*);
+    void (*fbfill_ptr)(struct rdp_state*, uint32_t, int, int*);
 
     int fb_format;
     int fb_size;
@@ -338,6 +339,8 @@ struct rdp_state
     // zbuffer
     uint32_t zb_address;
     int32_t pastrawdzmem;
+
+    int last_overwriting_scanline;
 };
 
 struct rdp_state state[PARALLEL_MAX_WORKERS];

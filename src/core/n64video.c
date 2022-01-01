@@ -87,7 +87,7 @@ static struct n64video_config config;
 
 static struct
 {
-    bool fillmbitcrashes, vbusclock, nolerp;
+    bool fillmbitcrashes, vbusclock;
 } onetimewarnings;
 
 static int rdp_pipeline_crashed = 0;

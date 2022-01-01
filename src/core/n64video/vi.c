@@ -77,6 +77,7 @@ static int32_t vi_width_low;
 static uint32_t frame_buffer;
 static uint32_t tvfadeoutstate[PRESCALE_HEIGHT];
 static uint32_t zb_address;
+static int32_t vinnglitch;
 
 // prescale buffer
 static struct n64video_pixel prescale[PRESCALE_WIDTH * PRESCALE_HEIGHT];
@@ -270,6 +271,22 @@ static void vi_process_full_parallel(uint32_t worker_id)
                 vi_vl_lerp(&color, scancolor, yfrac);
                 vi_vl_lerp(&nextcolor, scannextcolor, yfrac);
                 vi_vl_lerp(&color, nextcolor, xfrac);
+            } else if (vinnglitch) {
+                if (prev_line_x & vinnglitch) {
+                    color.r = color.g = color.b = 0;
+                } else {
+                    cur_x = pixels + (prev_line_x & (vinnglitch - 1));
+                    vi_fetch_filter_ptr(&color, frame_buffer, cur_x, ctrl, vres, 0);
+
+                    if (ctrl.divot_enable) {
+                        struct n64video_pixel prevcol, nextcol;
+                        prev_x = pixels + ((prev_line_x - 1) & (vinnglitch - 1));
+                        next_x = pixels + (line_x & (vinnglitch - 1));
+                        vi_fetch_filter_ptr(&prevcol, frame_buffer, prev_x, ctrl, vres, 0);
+                        vi_fetch_filter_ptr(&nextcol, frame_buffer, next_x, ctrl, vres, 0);
+                        divot_filter(&color, color, prevcol, nextcol);
+                    }
+                }
             }
 
             struct n64video_pixel* pixel = &pixel_row[x];
@@ -323,9 +340,9 @@ static bool vi_process_full(struct n64video_frame_buffer* fb)
         }
 
         prevvicurrent = v_current_line;
-        oldvstart = v_start;
     }
 
+    oldvstart = v_start;
     prevserrate = validinterlace;
 
     bool validh = hres > 0 && h_start < PRESCALE_WIDTH;
@@ -632,6 +649,10 @@ void n64video_update_screen(struct n64video_frame_buffer* fb)
     vi_width_low = *vi_reg_ptr[VI_WIDTH] & 0xfff;
     frame_buffer = *vi_reg_ptr[VI_ORIGIN] & 0xffffff;
 
+    if (ctrl.aa_mode == VI_AA_REPLICATE && (ctrl.type & 2) && h_start < (ctrl.type == VI_TYPE_RGBA5551 ? 0x80 : 0x40) && x_add <= 0x200) {
+        vinnglitch = ctrl.type == VI_TYPE_RGBA5551 ? 0x40 : 0x20;
+    }
+
     // cancel if the frame buffer contains no valid address
     if (!frame_buffer) {
         fb->valid = false;
@@ -656,15 +677,6 @@ void n64video_update_screen(struct n64video_frame_buffer* fb)
     // check for unexpected VI type bits set
     if (ctrl.type & ~3) {
         msg_error("Unknown framebuffer format %d", ctrl.type);
-    }
-
-    // warn about AA glitches in certain cases
-    if (ctrl.aa_mode == VI_AA_REPLICATE && ctrl.type == VI_TYPE_RGBA5551 &&
-        h_start < 0x80 && x_add <= 0x200 && !onetimewarnings.nolerp) {
-        msg_warning("vi_update: Disabling VI interpolation in 16-bit color "
-                    "modes causes glitches on hardware if h_start is less than "
-                    "128 pixels and x_scale is less or equal to 0x200.");
-        onetimewarnings.nolerp = true;
     }
 
     // check for the dangerous vbus_clock_enable flag. it was introduced to
