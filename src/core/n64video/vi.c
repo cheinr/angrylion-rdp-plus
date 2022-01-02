@@ -42,7 +42,6 @@ struct vi_reg_ctrl
     bool serrate;
     bool test_mode;
     uint8_t aa_mode;
-    bool reserved;
     bool kill_we;
     uint8_t pixel_advance;
     bool dither_filter_enable;
@@ -669,9 +668,8 @@ void n64video_update_screen(struct n64video_frame_buffer* fb)
     ctrl.serrate = (vi_control >> 6) & 1;
     ctrl.test_mode = (vi_control >> 7) & 1;
     ctrl.aa_mode = (vi_control >> 8) & 3;
-    ctrl.reserved = (vi_control >> 9) & 1;
-    ctrl.kill_we = (vi_control >> 10) & 1;
-    ctrl.pixel_advance = (vi_control >> 12) & 0xf;
+    ctrl.kill_we = (vi_control >> 11) & 1;
+    ctrl.pixel_advance = (vi_control >> 12) & 0x7;
     ctrl.dither_filter_enable = (vi_control >> 16) & 1;
 
     // check for unexpected VI type bits set
