@@ -1097,6 +1097,8 @@ static void render_spans_2cycle_complete(struct rdp_state* wstate, int start, in
 
             wstate->fbread2_ptr(wstate, curpixel, &curpixel_memcvg);
 
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+
             if (wen)
                 wen = blender_2cycle_cycle0(wstate, curpixel_cvg, curpixel_cvbit);
 
