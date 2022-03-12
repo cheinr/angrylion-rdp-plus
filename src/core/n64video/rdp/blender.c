@@ -330,8 +330,6 @@ static STRICTINLINE int blender_2cycle_cycle0(struct rdp_state* wstate, uint32_t
         wstate->blended_pixel_color.b = b;
     }
 
-    wstate->memory_color = wstate->pre_memory_color;
-
     return wen;
 }
 
