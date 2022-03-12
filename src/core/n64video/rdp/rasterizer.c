@@ -391,12 +391,12 @@ static void render_spans_1cycle_complete(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -532,7 +532,7 @@ static void render_spans_1cycle_complete(struct rdp_state* wstate, int start, in
 
             wstate->fbread1_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_1cycle(wstate, &fir, &fig, &fib, cdith, blend_en, prewrap, curpixel_cvg, curpixel_cvbit);
@@ -607,12 +607,12 @@ static void render_spans_1cycle_notexel1(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -714,7 +714,7 @@ static void render_spans_1cycle_notexel1(struct rdp_state* wstate, int start, in
 
             wstate->fbread1_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_1cycle(wstate, &fir, &fig, &fib, cdith, blend_en, prewrap, curpixel_cvg, curpixel_cvbit);
@@ -785,12 +785,12 @@ static void render_spans_1cycle_notex(struct rdp_state* wstate, int start, int e
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -866,7 +866,7 @@ static void render_spans_1cycle_notex(struct rdp_state* wstate, int start, int e
 
             wstate->fbread1_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_1cycle(wstate, &fir, &fig, &fib, cdith, blend_en, prewrap, curpixel_cvg, curpixel_cvbit);
@@ -947,12 +947,12 @@ static void render_spans_2cycle_complete(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1215,12 +1215,12 @@ static void render_spans_2cycle_notexelnext(struct rdp_state* wstate, int start,
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1322,7 +1322,7 @@ static void render_spans_2cycle_notexelnext(struct rdp_state* wstate, int start,
 
             wstate->fbread2_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_2cycle_cycle0(wstate, curpixel_cvg, curpixel_cvbit);
@@ -1439,12 +1439,12 @@ static void render_spans_2cycle_notexel1(struct rdp_state* wstate, int start, in
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1545,7 +1545,7 @@ static void render_spans_2cycle_notexel1(struct rdp_state* wstate, int start, in
 
             wstate->fbread2_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_2cycle_cycle0(wstate, curpixel_cvg, curpixel_cvbit);
@@ -1653,12 +1653,12 @@ static void render_spans_2cycle_notex(struct rdp_state* wstate, int start, int e
         xinc = -1;
     }
 
-    uint16_t dzpix;
+    int dzpix;
     if (!wstate->other_modes.z_source_sel)
-        dzpix = (uint16_t)wstate->spans_dzpix;
+        dzpix = wstate->spans_dzpix;
     else
     {
-        dzpix = (uint16_t)wstate->primitive_delta_z;
+        dzpix = wstate->primitive_delta_z;
         dzinc = wstate->spans_cdz = wstate->spans_dzdy = 0;
     }
     int dzpixenc = dz_compress(dzpix);
@@ -1743,7 +1743,7 @@ static void render_spans_2cycle_notex(struct rdp_state* wstate, int start, int e
 
             wstate->fbread2_ptr(wstate, curpixel, &curpixel_memcvg);
 
-            wen = z_compare(wstate, zbcur, sz, dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
+            wen = z_compare(wstate, zbcur, sz, (uint16_t)dzpix, dzpixenc, &blend_en, &prewrap, &curpixel_cvg, curpixel_memcvg);
 
             if (wen)
                 wen = blender_2cycle_cycle0(wstate, curpixel_cvg, curpixel_cvbit);

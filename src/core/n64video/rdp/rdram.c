@@ -139,7 +139,7 @@ static STRICTINLINE void rdram_write_pair8(uint32_t in, uint8_t rval, int flip, 
 
             if (!(in & 1)) {
                 if (hdst8 & HB_CLEAN) {
-                    rdram_hidden[in >> 1] = (rdram16[(in >> 1) ^ WORD_ADDR_XOR] & 1) ? 1 : 0;
+                    rdram_hidden[in >> 1] = (rdram16[(in >> 1) ^ WORD_ADDR_XOR] & 1) != 0;
                 } else {
                     rdram_hidden[in >> 1] &= ~2;
                 }
