@@ -27,6 +27,7 @@
 #define KEY_VI_HIDE_OVERSCAN "hide_overscan"
 #define KEY_VI_EXCLUSIVE "exclusive"
 #define KEY_VI_VSYNC "vsync"
+#define KEY_VI_INT_SCALING "integer_scaling"
 
 #define KEY_DP_COMPAT "compat"
 
@@ -206,6 +207,8 @@ static void config_handle(const char* key, const char* value, const char* sectio
             config.vi.exclusive = strtol(value, NULL, 0) != 0;
         } else if (!_strcmpi(key, KEY_VI_VSYNC)) {
             config.vi.vsync = strtol(value, NULL, 0) != 0;
+        } else if (!_strcmpi(key, KEY_VI_INT_SCALING)) {
+            config.vi.integer_scaling = strtol(value, NULL, 0) != 0;
         }
     } else if (!_strcmpi(section, SECTION_DISPLAY_PROCESSOR)) {
         if (!_strcmpi(key, KEY_DP_COMPAT)) {
@@ -315,6 +318,7 @@ bool config_save(void)
     config_write_int32(fp, KEY_VI_HIDE_OVERSCAN, config.vi.hide_overscan);
     config_write_int32(fp, KEY_VI_EXCLUSIVE, config.vi.exclusive);
     config_write_int32(fp, KEY_VI_VSYNC, config.vi.vsync);
+    config_write_int32(fp, KEY_VI_INT_SCALING, config.vi.integer_scaling);
     fputs("\n", fp);
 
     config_write_section(fp, SECTION_DISPLAY_PROCESSOR);
