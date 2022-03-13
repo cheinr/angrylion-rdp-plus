@@ -381,10 +381,12 @@ void vdac_sync(bool valid)
     // get current window size and position
     int32_t win_width;
     int32_t win_height;
-    int32_t win_x;
-    int32_t win_y;
+    int32_t out_width;
+    int32_t out_height;
+    int32_t out_x;
+    int32_t out_y;
 
-    screen_adjust(m_fbtex_width, m_fbtex_height, &win_width, &win_height, &win_x, &win_y);
+    screen_adjust(m_fbtex_width, m_fbtex_height, &win_width, &win_height, &out_x, &out_y);
 
     // if the screen is invalid or hidden, do nothing
     if (win_width <= 0 || win_height <= 0) {
@@ -398,21 +400,24 @@ void vdac_sync(bool valid)
     }
 
     if (m_integer_scaling) {
-        // get smallest integer scale that is at least 1
-        uint32_t scale_x = (uint32_t)win_width < m_fbtex_width ? 1 : (uint32_t)win_width / m_fbtex_width;
-        uint32_t scale_y = (uint32_t)win_height < m_fbtex_height ? 1 : (uint32_t)win_height / m_fbtex_height;
-        uint32_t scale = scale_x > scale_y ? scale_x : scale_y;
+        out_width = (int32_t)m_fbtex_width;
+        out_height = (int32_t)m_fbtex_height;
 
-        // get new window size (or rather viewport size in this context)
-        int32_t win_width_new = m_fbtex_width * scale;
-        int32_t win_height_new = m_fbtex_height * scale;
+        // scale down if output is bigger than window
+        while (out_width > win_width || out_height > win_height) {
+            out_width /= 2;
+            out_height /= 2;
+        }
+
+        // scale up if doubled size is smaller than window
+        while (out_width * 2 <= win_width && out_height * 2 <= win_height) {
+            out_width *= 2;
+            out_height *= 2;
+        }
 
         // apply new size and offset
-        win_x = (win_width - win_width_new) / 2;
-        win_y = (win_height - win_height_new) / 2;
-
-        win_width = win_width_new;
-        win_height = win_height_new;
+        out_x += (win_width - out_width) / 2;
+        out_y += (win_height - out_height) / 2;
     } else {
         int32_t hw = m_fbtex_height * win_width;
         int32_t wh = m_fbtex_width * win_height;
@@ -421,12 +426,17 @@ void vdac_sync(bool valid)
         // than the current display mode
         if (hw > wh) {
             int32_t w_max = wh / m_fbtex_height;
-            win_x += (win_width - w_max) / 2;
-            win_width = w_max;
+            out_x += (win_width - w_max) / 2;
+            out_width = w_max;
+            out_height = win_height;
         } else if (hw < wh) {
             int32_t h_max = hw / m_fbtex_width;
-            win_y += (win_height - h_max) / 2;
-            win_height = h_max;
+            out_y += (win_height - h_max) / 2;
+            out_width = win_width;
+            out_height = h_max;
+        } else {
+            out_width = win_width;
+            out_height = win_height;
         }
     }
 
@@ -440,20 +450,19 @@ void vdac_sync(bool valid)
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-        GLint srcX0 = 0;
-        GLint srcY0 = 0;
-        GLint srcX1 = m_fbtex_width - 1;
-        GLint srcY1 = m_fbtex_height - 1;
-        GLint dstX0 = win_x;
-        GLint dstY0 = win_y;
-        GLint dstX1 = dstX0 + win_width - 1;
-        GLint dstY1 = dstY0 + win_height - 1;
+        GLint src_x0 = 0;
+        GLint src_y0 = 0;
+        GLint src_x1 = m_fbtex_width - 1;
+        GLint src_y1 = m_fbtex_height - 1;
+        GLint dst_x0 = out_x;
+        GLint dst_y0 = out_y;
+        GLint dst_x1 = dst_x0 + out_width - 1;
+        GLint dst_y1 = dst_y0 + out_height - 1;
 
-        glViewport(win_x, win_y, win_width, win_height);
-        glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(src_x0, src_y0, src_x1, src_y1, dst_x0, dst_y0, dst_x1, dst_y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     } else {
         // configure viewport
-        glViewport(win_x, win_y, win_width, win_height);
+        glViewport(out_x, out_y, out_width, out_height);
 
         // draw fullscreen triangle
         glDrawArrays(GL_TRIANGLES, 0, 3);
