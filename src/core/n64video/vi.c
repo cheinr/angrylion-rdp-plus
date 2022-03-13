@@ -110,8 +110,8 @@ static void vi_init(void)
 static void vi_process_full_parallel(uint32_t worker_id)
 {
     int32_t y;
-    struct n64video_pixel viaa_array[0xa10 << 1];
-    struct n64video_pixel divot_array[0xa10 << 1];
+    struct n64video_pixel *viaa_array = state[worker_id].viaa_array;
+    struct n64video_pixel *divot_array = state[worker_id].divot_array;
 
     int32_t cache_marker = 0, cache_next_marker = 0, divot_cache_marker = 0, divot_cache_next_marker = 0;
     int32_t cache_marker_init = (x_start >> 10) - 1;
@@ -292,7 +292,7 @@ static void vi_process_full_parallel(uint32_t worker_id)
 
             if (x >= minhpass && x < maxhpass) {
                 *pixel = color;
-                gamma_filters(pixel, ctrl.gamma_enable, ctrl.gamma_dither_enable, &state[worker_id].rseed);
+                gamma_filters(pixel, ctrl.gamma_enable, ctrl.gamma_dither_enable, &state[worker_id].vi_rseed);
             } else {
                 pixel->r = pixel->g = pixel->b = 0;
             }
@@ -536,7 +536,7 @@ static void vi_process_fast_parallel(uint32_t worker_id)
                             return;
                     }
 
-                    gamma_filters(pixel, ctrl.gamma_enable, false, &state[worker_id].rseed);
+                    gamma_filters(pixel, ctrl.gamma_enable, false, &state[worker_id].vi_rseed);
                     break;
 
                 case VI_MODE_DEPTH: {

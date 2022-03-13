@@ -168,7 +168,7 @@ static void n64video_init_parallel(uint32_t worker_id)
 
     wstate->stride = parallel_num_workers();
     wstate->offset = worker_id;
-    wstate->rseed = 3 + worker_id * 13;
+    wstate->rseed = wstate->vi_rseed = 3 + worker_id * 13;
 }
 
 void n64video_init(struct n64video_config* _config)

@@ -340,7 +340,11 @@ struct rdp_state
     uint32_t zb_address;
     int32_t pastrawdzmem;
 
+    // video interface
+    uint32_t vi_rseed;
     int last_overwriting_scanline;
+    struct n64video_pixel viaa_array[0xa10 << 1];
+    struct n64video_pixel divot_array[0xa10 << 1];
 };
 
 struct rdp_state state[PARALLEL_MAX_WORKERS];
@@ -566,6 +570,7 @@ static void deduce_derivatives(struct rdp_state* wstate)
 
 void rdp_init(struct rdp_state* wstate)
 {
+    memset(wstate, 0, sizeof(*wstate));
     fb_init(wstate);
     combiner_init(wstate);
     tex_init(wstate);
