@@ -23,6 +23,11 @@
 
 #define M64P_PLUGIN_PROTOTYPES 1
 
+#ifdef M64P_STATIC_PLUGINS
+#define M64P_CORE_PROTOTYPES 1
+#endif
+
+
 #define KEY_FULLSCREEN "Fullscreen"
 #define KEY_SCREEN_WIDTH "ScreenWidth"
 #define KEY_SCREEN_HEIGHT "ScreenHeight"
@@ -42,6 +47,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <stdio.h>
+
 #include "gfx_m64p.h"
 
 #include "api/m64p_types.h"
@@ -54,12 +61,18 @@
 #include "output/screen.h"
 #include "output/vdac.h"
 
+
+#if (!M64P_STATIC_PLUGINS)
+
 static ptr_ConfigOpenSection      ConfigOpenSection = NULL;
 static ptr_ConfigSaveSection      ConfigSaveSection = NULL;
 static ptr_ConfigSetDefaultInt    ConfigSetDefaultInt = NULL;
 static ptr_ConfigSetDefaultBool   ConfigSetDefaultBool = NULL;
 static ptr_ConfigGetParamInt      ConfigGetParamInt = NULL;
 static ptr_ConfigGetParamBool     ConfigGetParamBool = NULL;
+
+
+#endif
 static ptr_PluginGetVersion       CoreGetVersion = NULL;
 
 static bool warn_hle;
@@ -69,7 +82,10 @@ void *debug_call_context;
 static struct n64video_config config;
 
 m64p_dynlib_handle CoreLibHandle;
-GFX_INFO gfx;
+
+
+GFX_INFO g_gfx;
+
 void (*render_callback)(int);
 
 static m64p_handle configVideoGeneral = NULL;
@@ -82,7 +98,13 @@ extern int32_t win_width;
 extern int32_t win_height;
 extern int32_t win_fullscreen;
 
-EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Context,
+EXPORT m64p_error CALL
+#if M64P_STATIC_PLUGINS
+PluginStartupVideo
+#else
+PluginStartupVideo
+#endif
+(m64p_dynlib_handle _CoreLibHandle, void *Context,
                                      void (*DebugCallback)(void *, int, const char *))
 {
     if (plugin_initialized) {
@@ -95,12 +117,14 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
 
     CoreLibHandle = _CoreLibHandle;
 
+#if (!M64P_STATIC_PLUGINS)
     ConfigOpenSection = (ptr_ConfigOpenSection)DLSYM(CoreLibHandle, "ConfigOpenSection");
     ConfigSaveSection = (ptr_ConfigSaveSection)DLSYM(CoreLibHandle, "ConfigSaveSection");
     ConfigSetDefaultInt = (ptr_ConfigSetDefaultInt)DLSYM(CoreLibHandle, "ConfigSetDefaultInt");
     ConfigSetDefaultBool = (ptr_ConfigSetDefaultBool)DLSYM(CoreLibHandle, "ConfigSetDefaultBool");
     ConfigGetParamInt = (ptr_ConfigGetParamInt)DLSYM(CoreLibHandle, "ConfigGetParamInt");
     ConfigGetParamBool = (ptr_ConfigGetParamBool)DLSYM(CoreLibHandle, "ConfigGetParamBool");
+#endif
 
     ConfigOpenSection("Video-General", &configVideoGeneral);
     ConfigOpenSection("Video-AngrylionPlus", &configVideoAngrylionPlus);
@@ -109,7 +133,11 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
     ConfigSetDefaultInt(configVideoGeneral, KEY_SCREEN_WIDTH, 640, "Width of output window or fullscreen width");
     ConfigSetDefaultInt(configVideoGeneral, KEY_SCREEN_HEIGHT, 480, "Height of output window or fullscreen height");
 
+#if (!M64P_STATIC_PLUGINS)
     CoreGetVersion = (ptr_PluginGetVersion)DLSYM(CoreLibHandle, "PluginGetVersion");
+#else
+    CoreGetVersion = &CoreGetAPIVersions;
+#endif
 
     n64video_config_init(&config);
 
@@ -130,7 +158,13 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle _CoreLibHandle, void *Co
     return M64ERR_SUCCESS;
 }
 
-EXPORT m64p_error CALL PluginShutdown(void)
+EXPORT m64p_error CALL
+#if M64P_STATIC_PLUGINS
+PluginShutdownVideo
+#else
+PluginShutdownVideo
+#endif
+(void)
 {
     if (!plugin_initialized) {
         return M64ERR_NOT_INIT;
@@ -144,7 +178,13 @@ EXPORT m64p_error CALL PluginShutdown(void)
     return M64ERR_SUCCESS;
 }
 
-EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *PluginVersion, int *APIVersion, const char **PluginNamePtr, int *Capabilities)
+EXPORT m64p_error CALL
+#if (M64P_STATIC_PLUGINS)
+PluginGetVersionVideo
+#else
+PluginGetVersionVideo
+#endif
+(m64p_plugin_type *PluginType, int *PluginVersion, int *APIVersion, const char **PluginNamePtr, int *Capabilities)
 {
     /* set version info */
     if (PluginType != NULL) {
@@ -172,7 +212,7 @@ EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *Plugi
 
 EXPORT int CALL InitiateGFX (GFX_INFO Gfx_Info)
 {
-    gfx = Gfx_Info;
+    g_gfx = Gfx_Info;
 
     return 1;
 }
@@ -196,8 +236,10 @@ EXPORT void CALL ProcessRDPList(void)
     n64video_process_list();
 }
 
-EXPORT int CALL RomOpen (void)
+// TODO
+EXPORT int CALL RomOpenVideo (void)
 {
+  printf("RomOpenVideo\n");
     win_fullscreen = ConfigGetParamBool(configVideoGeneral, KEY_FULLSCREEN);
     win_width = ConfigGetParamInt(configVideoGeneral, KEY_SCREEN_WIDTH);
     win_height = ConfigGetParamInt(configVideoGeneral, KEY_SCREEN_HEIGHT);
@@ -213,30 +255,33 @@ EXPORT int CALL RomOpen (void)
 
     config.dp.compat = ConfigGetParamInt(configVideoAngrylionPlus, KEY_DP_COMPAT);
 
-    config.gfx.rdram = gfx.RDRAM;
+    config.gfx.rdram = g_gfx.RDRAM;
 
     int core_version;
     CoreGetVersion(NULL, &core_version, NULL, NULL, NULL);
     if (core_version >= 0x020501) {
-        config.gfx.rdram_size = *gfx.RDRAM_SIZE;
+        config.gfx.rdram_size = *g_gfx.RDRAM_SIZE;
     } else {
         config.gfx.rdram_size = RDRAM_MAX_SIZE;
     }
 
-    config.gfx.dmem = gfx.DMEM;
-    config.gfx.mi_intr_reg = (uint32_t*)gfx.MI_INTR_REG;
-    config.gfx.mi_intr_cb = gfx.CheckInterrupts;
+    config.gfx.dmem = g_gfx.DMEM;
+    config.gfx.mi_intr_reg = (uint32_t*)g_gfx.MI_INTR_REG;
+    config.gfx.mi_intr_cb = g_gfx.CheckInterrupts;
 
-    config.gfx.vi_reg = (uint32_t**)&gfx.VI_STATUS_REG;
-    config.gfx.dp_reg = (uint32_t**)&gfx.DPC_START_REG;
+    config.gfx.vi_reg = (uint32_t**)&g_gfx.VI_STATUS_REG;
+    config.gfx.dp_reg = (uint32_t**)&g_gfx.DPC_START_REG;
 
+    printf("n64video_init\n");
     n64video_init(&config);
+    printf("vdac_init\n");
     vdac_init(&config);
 
+    printf("RomOpenVideo DONE\n");
     return 1;
 }
 
-EXPORT void CALL RomClosed (void)
+EXPORT void CALL RomClosedVideo (void)
 {
     vdac_close();
     n64video_close();

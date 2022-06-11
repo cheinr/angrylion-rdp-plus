@@ -177,8 +177,15 @@ typedef struct {
 typedef void (*ptr_RomClosed)(void);
 typedef int  (*ptr_RomOpen)(void);
 #if defined(M64P_PLUGIN_PROTOTYPES)
+
+#if M64P_STATIC_PLUGINS
+EXPORT int  CALL RomOpenVideo(void);
+EXPORT void CALL RomClosedVideo(void);
+#else
 EXPORT int  CALL RomOpen(void);
 EXPORT void CALL RomClosed(void);
+#endif
+  
 #endif
 
 /* video plugin function pointer types */

@@ -8,7 +8,9 @@
 #include "output/screen.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
+#if (!M64P_STATIC_PLUGINS)
 /* definitions of pointers to Core video extension functions */
 static ptr_VidExt_Init                  CoreVideo_Init = NULL;
 static ptr_VidExt_Quit                  CoreVideo_Quit = NULL;
@@ -21,6 +23,21 @@ static ptr_VidExt_GL_GetProcAddress     CoreVideo_GL_GetProcAddress = NULL;
 static ptr_VidExt_GL_SetAttribute       CoreVideo_GL_SetAttribute = NULL;
 static ptr_VidExt_GL_GetAttribute       CoreVideo_GL_GetAttribute = NULL;
 static ptr_VidExt_GL_SwapBuffers        CoreVideo_GL_SwapBuffers = NULL;
+#else
+
+#define CoreVideo_Init VidExt_Init
+#define CoreVideo_Quit VidExt_Init
+#define CoreVideo_ListFullscreenModes VidExt_ListFullscreenModes
+#define CoreVideo_SetVideoMode VidExt_SetVideoMode
+#define CoreVideo_SetCaption VidExt_SetCaption
+#define CoreVideo_ToggleFullScreen VidExt_ToggleFullScreen
+#define CoreVideo_ResizeWindow VidExt_ResizeWindow
+#define CoreVideo_GL_GetProcAddress VidExt_GL_GetProcAddress
+#define CoreVideo_GL_SetAttribute VidExt_GL_SetAttribute
+#define CoreVideo_GL_GetAttribute VidExt_GL_GetAttribute
+#define CoreVideo_GL_SwapBuffers VidExt_GL_SwapBuffers
+
+#endif
 
 // framebuffer texture states
 int32_t win_width;
@@ -36,6 +53,7 @@ void screen_init(struct n64video_config* config)
 {
     UNUSED(config);
 
+#if (!M64P_STATIC_PLUGINS)
     /* Get the core Video Extension function pointers from the library handle */
     CoreVideo_Init = (ptr_VidExt_Init) DLSYM(CoreLibHandle, "VidExt_Init");
     CoreVideo_Quit = (ptr_VidExt_Quit) DLSYM(CoreLibHandle, "VidExt_Quit");
@@ -48,6 +66,7 @@ void screen_init(struct n64video_config* config)
     CoreVideo_GL_SetAttribute = (ptr_VidExt_GL_SetAttribute) DLSYM(CoreLibHandle, "VidExt_GL_SetAttribute");
     CoreVideo_GL_GetAttribute = (ptr_VidExt_GL_GetAttribute) DLSYM(CoreLibHandle, "VidExt_GL_GetAttribute");
     CoreVideo_GL_SwapBuffers = (ptr_VidExt_GL_SwapBuffers) DLSYM(CoreLibHandle, "VidExt_GL_SwapBuffers");
+#endif
 
     CoreVideo_Init();
     CoreVideo_SetCaption(CORE_NAME);
@@ -61,8 +80,8 @@ void screen_init(struct n64video_config* config)
     CoreVideo_GL_SetAttribute(M64P_GL_CONTEXT_MAJOR_VERSION, 3);
     CoreVideo_GL_SetAttribute(M64P_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
-
-    CoreVideo_SetVideoMode(win_width, win_height, 0, win_fullscreen ? M64VIDEO_FULLSCREEN : M64VIDEO_WINDOWED, M64VIDEOFLAG_SUPPORT_RESIZING);
+    
+    CoreVideo_SetVideoMode(640, 480, 0, win_fullscreen ? M64VIDEO_FULLSCREEN : M64VIDEO_WINDOWED, M64VIDEOFLAG_SUPPORT_RESIZING);
 }
 
 void screen_adjust(int32_t width_out, int32_t height_out, int32_t* width, int32_t* height, int32_t* x, int32_t* y)
@@ -70,8 +89,8 @@ void screen_adjust(int32_t width_out, int32_t height_out, int32_t* width, int32_
     UNUSED(width_out);
     UNUSED(height_out);
 
-    *width = win_width;
-    *height = win_height;
+    *width = 640;//win_width;
+    *height = 480;//win_height;
     *x = 0;
     *y = 0;
 }

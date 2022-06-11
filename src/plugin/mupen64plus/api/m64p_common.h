@@ -24,8 +24,9 @@
  * to the dynamic libraries.
  */
 
-#if !defined(M64P_COMMON_H)
-#define M64P_COMMON_H
+
+//#if !defined(M64P_COMMON_H)
+//#define M64P_COMMON_H
 
 #include "m64p_types.h"
 
@@ -39,9 +40,9 @@ extern "C" {
  * function is the same for the core library and the plugins.
  */
 typedef m64p_error (*ptr_PluginGetVersion)(m64p_plugin_type *, int *, int *, const char **, int *);
-#if defined(M64P_PLUGIN_PROTOTYPES) || defined(M64P_CORE_PROTOTYPES)
-EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *, int *, int *, const char **, int *);
-#endif
+
+EXPORT m64p_error CALL
+PluginGetVersionVideo(m64p_plugin_type *, int *, int *, const char **, int *);
 
 /* CoreGetAPIVersions()
  *
@@ -69,7 +70,13 @@ EXPORT const char * CALL CoreErrorMessage(m64p_error);
 */
 typedef m64p_error (*ptr_PluginStartup)(m64p_dynlib_handle, void *, void (*)(void *, int, const char *));
 #if defined(M64P_PLUGIN_PROTOTYPES) || defined(M64P_CORE_PROTOTYPES)
-EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle, void *, void (*)(void *, int, const char *));
+EXPORT m64p_error CALL
+#if M64P_STATIC_PLUGINS
+PluginStartupVideo
+#else
+PluginStartup
+#endif
+(m64p_dynlib_handle, void *, void (*)(void *, int, const char *));
 #endif
 
 /* PluginShutdown()
@@ -79,12 +86,19 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle, void *, void (*)(void *
 */
 typedef m64p_error (*ptr_PluginShutdown)(void);
 #if defined(M64P_PLUGIN_PROTOTYPES) || defined(M64P_CORE_PROTOTYPES)
-EXPORT m64p_error CALL PluginShutdown(void);
+EXPORT m64p_error CALL
+#if M64P_STATIC_PLUGINS
+PluginShutdownVideo
+#else
+PluginShutdown
+#endif
+(void);
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* #define M64P_COMMON_H */
+
+//#endif /* #define M64P_COMMON_H */
 

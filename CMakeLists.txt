@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 
 option(GLES "Set to ON to use OpenGL ES 3.0 renderer instead of OpenGL 3.3 core")
+option(M64P_STATIC_PLUGINS "Use static plugin api naming and avoid dynamic calls")
 
 project(angrylion-plus)
 
 include(GNUInstallDirs)
 
 set(OpenGL_GL_PREFERENCE GLVND)
+
+if(M64P_STATIC_PLUGINS)
+    add_compile_definitions(M64P_STATIC_PLUGINS=1)
+else()
+    add_compile_definitions(M64P_STATIC_PLUGINS=0)
+endif()
 
 if(GLES)
     message("OpenGL ES 3.0 renderer enabled")
@@ -129,11 +136,13 @@ endif(WIN32)
 
 # Mupen64Plus GFX plugin
 set(NAME_PLUGIN_M64P "mupen64plus-video-${CMAKE_PROJECT_NAME}")
+set(NAME_PLUGIN_STATIC_M64P "mupen64plus-video-${CMAKE_PROJECT_NAME}-web")
 
 set(PATH_PLUGIN_M64P "${PATH_SRC}/plugin/mupen64plus")
 
 file(GLOB SOURCES_PLUGIN_M64P "${PATH_PLUGIN_M64P}/*.c")
 add_library(${NAME_PLUGIN_M64P} SHARED ${SOURCES_PLUGIN_M64P})
+add_library(${NAME_PLUGIN_STATIC_M64P} STATIC ${SOURCES_PLUGIN_M64P} ${SOURCES_CORE} ${SOURCES_OUTPUT})
 
 if(NOT ANDROID)
     set_target_properties(${NAME_PLUGIN_M64P} PROPERTIES PREFIX "")
