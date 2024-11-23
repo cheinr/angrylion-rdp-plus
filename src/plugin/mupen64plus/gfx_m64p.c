@@ -136,7 +136,7 @@ PluginStartupVideo
 #if (!M64P_STATIC_PLUGINS)
     CoreGetVersion = (ptr_PluginGetVersion)DLSYM(CoreLibHandle, "PluginGetVersion");
 #else
-    CoreGetVersion = &CoreGetAPIVersions;
+    CoreGetVersion = (ptr_PluginGetVersion) &CoreGetAPIVersions;
 #endif
 
     n64video_config_init(&config);
