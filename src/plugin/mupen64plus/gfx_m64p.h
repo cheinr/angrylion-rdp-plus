@@ -1,9 +1,7 @@
 #pragma once
 
-#ifdef M64P_STATIC_PLUGINS
-
+#if M64P_STATIC_PLUGINS
 #define M64P_CORE_PROTOTYPES 1
-
 #endif
 
 #include "../../core/n64video.h"

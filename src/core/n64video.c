@@ -177,11 +177,6 @@ void n64video_init(struct n64video_config* _config)
         config = *_config;
     }
 
-    // TODO
-    config.parallel = true;
-    config.busyloop = true;
-    
-
     // initialize static lookup tables and RDP state, once is enough
     static bool static_init;
     if (!static_init) {

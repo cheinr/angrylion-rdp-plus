@@ -42,7 +42,13 @@ extern "C" {
 typedef m64p_error (*ptr_PluginGetVersion)(m64p_plugin_type *, int *, int *, const char **, int *);
 
 EXPORT m64p_error CALL
-PluginGetVersionVideo(m64p_plugin_type *, int *, int *, const char **, int *);
+#if (M64P_STATIC_PLUGINS)
+PluginGetVersionVideo
+#else
+PluginGetVersion
+#endif
+(m64p_plugin_type *, int *, int *, const char **, int *);
+
 
 /* CoreGetAPIVersions()
  *

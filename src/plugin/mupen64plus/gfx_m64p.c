@@ -23,7 +23,7 @@
 
 #define M64P_PLUGIN_PROTOTYPES 1
 
-#ifdef M64P_STATIC_PLUGINS
+#if M64P_STATIC_PLUGINS
 #define M64P_CORE_PROTOTYPES 1
 #endif
 
@@ -102,7 +102,7 @@ EXPORT m64p_error CALL
 #if M64P_STATIC_PLUGINS
 PluginStartupVideo
 #else
-PluginStartupVideo
+PluginStartup
 #endif
 (m64p_dynlib_handle _CoreLibHandle, void *Context,
                                      void (*DebugCallback)(void *, int, const char *))
@@ -162,7 +162,7 @@ EXPORT m64p_error CALL
 #if M64P_STATIC_PLUGINS
 PluginShutdownVideo
 #else
-PluginShutdownVideo
+PluginShutdown
 #endif
 (void)
 {
@@ -182,7 +182,7 @@ EXPORT m64p_error CALL
 #if (M64P_STATIC_PLUGINS)
 PluginGetVersionVideo
 #else
-PluginGetVersionVideo
+PluginGetVersion
 #endif
 (m64p_plugin_type *PluginType, int *PluginVersion, int *APIVersion, const char **PluginNamePtr, int *Capabilities)
 {
@@ -236,8 +236,13 @@ EXPORT void CALL ProcessRDPList(void)
     n64video_process_list();
 }
 
-// TODO
-EXPORT int CALL RomOpenVideo (void)
+EXPORT int CALL
+#if (M64P_STATIC_PLUGINS)
+RomOpenVideo
+#else
+RomOpen
+#endif
+(void)
 {
   printf("RomOpenVideo\n");
     win_fullscreen = ConfigGetParamBool(configVideoGeneral, KEY_FULLSCREEN);
@@ -281,7 +286,13 @@ EXPORT int CALL RomOpenVideo (void)
     return 1;
 }
 
-EXPORT void CALL RomClosedVideo (void)
+EXPORT void CALL
+#if (M64P_STATIC_PLUGINS)
+RomClosedVideo
+#else
+RomClosed
+#endif
+(void)
 {
     vdac_close();
     n64video_close();
